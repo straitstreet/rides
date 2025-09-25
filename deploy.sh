@@ -21,6 +21,9 @@ echo "🔌 Enabling required APIs..."
 gcloud services enable cloudbuild.googleapis.com --project=$PROJECT_ID
 gcloud services enable run.googleapis.com --project=$PROJECT_ID
 gcloud services enable containerregistry.googleapis.com --project=$PROJECT_ID
+gcloud services enable maps-backend.googleapis.com --project=$PROJECT_ID
+gcloud services enable places-backend.googleapis.com --project=$PROJECT_ID
+gcloud services enable geocoding-backend.googleapis.com --project=$PROJECT_ID
 
 # Build and deploy using Cloud Build
 echo "🏗️  Building application with Cloud Build..."

@@ -10,6 +10,8 @@ steps:
       - 'NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=${_NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY}'
       - '--build-arg'
       - 'PAYSTACK_SECRET_KEY=${_PAYSTACK_SECRET_KEY}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${_NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}'
       - '-t'
       - 'gcr.io/$PROJECT_ID/rides-app'
       - '.'
@@ -21,6 +23,7 @@ substitutions:
   _CLERK_SECRET_KEY: 'sk_test_KJyJU7AmhlzJVTMLskCtq9kaWGbOcSc8mE0bhp2dUW'
   _NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: 'pk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb'
   _PAYSTACK_SECRET_KEY: 'sk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb'
+  _NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: 'your_google_maps_api_key_here'
 
 images:
   - 'gcr.io/$PROJECT_ID/rides-app'

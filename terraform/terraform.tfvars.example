@@ -1,0 +1,12 @@
+# Terraform Variables for Rides Platform
+# Copy this file to terraform.tfvars and update values
+
+project_id = "your-google-cloud-project-id"
+region     = "us-central1"
+
+allowed_referrers = [
+  "http://localhost:3000/*",
+  "https://localhost:3000/*",
+  "https://your-domain.com/*",
+  "https://*.your-domain.com/*"
+]
