@@ -41,7 +41,7 @@ gcloud run deploy naija-rides-app \
     --max-instances 10 \
     --min-instances 0 \
     --port 3000 \
-    --set-env-vars NODE_ENV=production,NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ZXF1YWwtZ3JvdXBlci05MS5jbGVyay5hY2NvdW50cy5kZXYk,CLERK_SECRET_KEY=sk_test_KJyJU7AmhlzJVTMLskCtq9kaWGbOcSc8mE0bhp2dUW,NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb,PAYSTACK_SECRET_KEY=sk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb \
+    --set-env-vars NODE_ENV=production,NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ZXF1YWwtZ3JvdXBlci05MS5jbGVyay5hY2NvdW50cy5kZXYk,CLERK_SECRET_KEY=sk_test_KJyJU7AmhlzJVTMLskCtq9kaWGbOcSc8mE0bhp2dUW,NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb,PAYSTACK_SECRET_KEY=sk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-your_google_maps_api_key_here} \
     --project=$PROJECT_ID
 
 # Get the deployed URL
