@@ -16,7 +16,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { getCurrentUser } from '@/lib/auth';
+import { getMockUser } from '@/lib/auth';
+import { useUser } from '@clerk/nextjs';
 import {
   LayoutDashboard,
   Car,
@@ -141,7 +142,18 @@ const navigationItems: NavigationItem[] = [
  */
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const user = getCurrentUser();
+  const { user: clerkUser } = useUser();
+
+  // Use Clerk user data - only fall back to mock in development
+  const user = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.emailAddresses[0]?.emailAddress || '',
+    firstName: clerkUser.firstName || '',
+    lastName: clerkUser.lastName || '',
+    role: (clerkUser.publicMetadata?.role as 'admin' | 'seller' | 'buyer') || 'buyer',
+    isVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+    profileImage: clerkUser.imageUrl,
+  } : (process.env.NODE_ENV === 'development' ? getMockUser() : null);
 
   // Filter navigation items based on user role
   const visibleItems = navigationItems.filter(item =>

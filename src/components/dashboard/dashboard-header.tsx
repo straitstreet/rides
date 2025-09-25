@@ -28,7 +28,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { getCurrentUser } from '@/lib/auth';
+import { getMockUser } from '@/lib/auth';
+import { useUser, useClerk } from '@clerk/nextjs';
 
 /**
  * DashboardHeader Component
@@ -37,8 +38,20 @@ import { getCurrentUser } from '@/lib/auth';
  * notifications, and user profile management.
  */
 export function DashboardHeader() {
-  const user = getCurrentUser();
+  const { user: clerkUser, isLoaded } = useUser();
+  const { signOut } = useClerk();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Use Clerk user data - only fall back to mock in development
+  const user = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.emailAddresses[0]?.emailAddress || '',
+    firstName: clerkUser.firstName || '',
+    lastName: clerkUser.lastName || '',
+    role: (clerkUser.publicMetadata?.role as 'admin' | 'seller' | 'buyer') || 'buyer',
+    isVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+    profileImage: clerkUser.imageUrl,
+  } : (process.env.NODE_ENV === 'development' ? getMockUser() : null);
 
   // Mock data - replace with real API calls
   const notificationCount = 3;
@@ -55,8 +68,11 @@ export function DashboardHeader() {
    * Handle user logout
    */
   const handleLogout = () => {
-    console.log('Logout clicked');
-    // Implement actual logout logic
+    if (clerkUser) {
+      signOut({ redirectUrl: '/' });
+    } else {
+      console.log('Logout clicked - using mock user');
+    }
   };
 
   /**

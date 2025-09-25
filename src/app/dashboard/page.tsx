@@ -14,7 +14,8 @@
 
 'use client';
 
-import { getCurrentUser } from '@/lib/auth';
+import { getMockUser } from '@/lib/auth';
+import { useUser } from '@clerk/nextjs';
 import { SellerDashboard } from '@/components/dashboard/seller-dashboard';
 import { BuyerDashboard } from '@/components/dashboard/buyer-dashboard';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -26,8 +27,18 @@ import { AlertTriangle } from 'lucide-react';
  * Routes users to appropriate dashboard based on their role
  */
 export default function DashboardPage() {
-  // Get current user information (will be replaced with actual auth)
-  const user = getCurrentUser();
+  const { user: clerkUser, isLoaded } = useUser();
+
+  // Use Clerk user data - only fall back to mock in development
+  const user = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.emailAddresses[0]?.emailAddress || '',
+    firstName: clerkUser.firstName || '',
+    lastName: clerkUser.lastName || '',
+    role: (clerkUser.publicMetadata?.role as 'admin' | 'seller' | 'buyer') || 'buyer',
+    isVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+    profileImage: clerkUser.imageUrl,
+  } : (process.env.NODE_ENV === 'development' ? getMockUser() : null);
 
   // Handle case where user is not authenticated
   if (!user) {

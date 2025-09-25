@@ -1,12 +1,18 @@
+'use client';
+
 import { Car, MapPin, Search, Star, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { sampleCars } from '@/lib/seed-data';
+import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
+import { getRoleBasedRedirect } from '@/lib/auth';
+import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
+  const { user, isLoaded } = useUser();
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header */}
@@ -23,8 +29,32 @@ export default function Home() {
               <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">How it Works</a>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button variant="outline">Sign In</Button>
-              <Button>Get Started</Button>
+              {isLoaded && user ? (
+                <>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "h-9 w-9",
+                        userButtonPopoverCard: "shadow-xl",
+                      },
+                    }}
+                  />
+                  <Button asChild>
+                    <Link href={getRoleBasedRedirect((user.publicMetadata?.role as 'admin' | 'seller' | 'buyer') || 'buyer')}>
+                      Dashboard
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <SignInButton mode="modal">
+                    <Button variant="outline">Sign In</Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button>Get Started</Button>
+                  </SignUpButton>
+                </>
+              )}
             </div>
           </div>
         </div>
