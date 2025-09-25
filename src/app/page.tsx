@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { sampleCars } from '@/lib/seed-data';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { BookingModal } from '@/components/booking-modal';
+import { LocationAutocomplete } from '@/components/maps';
 // Helper function for role-based redirects
 const getRoleBasedRedirect = (role: 'admin' | 'seller' | 'buyer') => {
   switch (role) {
@@ -104,16 +105,18 @@ export default function Home() {
           {/* Compact Search Bar */}
           <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border p-4 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" aria-hidden="true" />
-                <Input
-                  placeholder="where?"
-                  className="pl-9 h-10 text-sm"
-                  value={pickupLocation}
-                  onChange={(e) => setPickupLocation(e.target.value)}
-                  aria-label="Pick-up location"
-                />
-              </div>
+              <LocationAutocomplete
+                placeholder="where?"
+                value={pickupLocation}
+                onChange={(value, place) => {
+                  setPickupLocation(value);
+                  if (place) {
+                    console.log('Selected place:', place);
+                  }
+                }}
+                className="h-10 text-sm"
+                bias="nigeria"
+              />
               <div className="relative">
                 <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input

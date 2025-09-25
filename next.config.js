@@ -27,11 +27,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.straitstreet-rides.com https://js.paystack.co https://www.googletagmanager.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.straitstreet-rides.com https://js.paystack.co https://www.googletagmanager.com https://maps.googleapis.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://clerk.straitstreet-rides.com https://api.paystack.co https://storage.googleapis.com wss:",
+              "connect-src 'self' https://clerk.straitstreet-rides.com https://api.paystack.co https://storage.googleapis.com https://maps.googleapis.com https://maps.gstatic.com https://fonts.googleapis.com wss:",
               "frame-src 'self' https://js.paystack.co",
               "object-src 'none'",
               "base-uri 'self'",

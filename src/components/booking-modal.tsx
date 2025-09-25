@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { CarLocationMap, LocationAutocomplete } from '@/components/maps';
 import Image from 'next/image';
 
 interface Car {
@@ -130,6 +131,16 @@ export function BookingModal({ isOpen, onClose, car }: BookingModalProps) {
             </div>
           </div>
 
+          {/* Car Location Map */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">car location</Label>
+            <CarLocationMap
+              location={car.location}
+              className="h-48 w-full rounded-lg"
+              zoom={12}
+            />
+          </div>
+
           {/* Booking Form */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -167,17 +178,17 @@ export function BookingModal({ isOpen, onClose, car }: BookingModalProps) {
 
           <div className="space-y-2">
             <Label htmlFor="pickup-location">pickup location *</Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="pickup-location"
-                placeholder="where would you like to pickup the car?"
-                className="pl-10"
-                value={pickupLocation}
-                onChange={(e) => setPickupLocation(e.target.value)}
-                required
-              />
-            </div>
+            <LocationAutocomplete
+              placeholder="where would you like to pickup the car?"
+              value={pickupLocation}
+              onChange={(value, place) => {
+                setPickupLocation(value);
+                if (place) {
+                  console.log('Pickup location selected:', place);
+                }
+              }}
+              bias="nigeria"
+            />
           </div>
 
           {/* Price Summary */}
