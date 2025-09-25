@@ -38,7 +38,7 @@ import { useUser, useClerk } from '@clerk/nextjs';
  * notifications, and user profile management.
  */
 export function DashboardHeader() {
-  const { user: clerkUser, isLoaded } = useUser();
+  const { user: clerkUser } = useUser();
   const { signOut } = useClerk();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

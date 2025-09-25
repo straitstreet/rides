@@ -1,11 +1,8 @@
 /**
- * Authentication utilities and types
+ * Client-side authentication utilities
  *
- * This module provides authentication helpers using Clerk.
- * It includes role-based access control and user management utilities.
+ * This module provides authentication helpers for client components.
  */
-
-import { currentUser } from '@clerk/nextjs/server';
 
 export type UserRole = 'admin' | 'seller' | 'buyer';
 
@@ -18,35 +15,6 @@ export interface User {
   isVerified: boolean;
   profileImage?: string;
 }
-
-/**
- * Get the current authenticated user
- * For client components, use useUser() from @clerk/nextjs
- * For server components, use this function
- */
-export const getCurrentUser = async (): Promise<User | null> => {
-  try {
-    const user = await currentUser();
-
-    if (!user) return null;
-
-    // Get role from user metadata, default to 'buyer'
-    const role = (user.publicMetadata?.role as UserRole) || 'buyer';
-
-    return {
-      id: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      role,
-      isVerified: user.emailAddresses[0]?.verification?.status === 'verified',
-      profileImage: user.imageUrl,
-    };
-  } catch (error) {
-    console.error('Error getting current user:', error);
-    return null;
-  }
-};
 
 /**
  * For client-side use - Mock user for development

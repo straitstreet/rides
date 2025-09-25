@@ -27,7 +27,7 @@ import { AlertTriangle } from 'lucide-react';
  * Routes users to appropriate dashboard based on their role
  */
 export default function DashboardPage() {
-  const { user: clerkUser, isLoaded } = useUser();
+  const { user: clerkUser } = useUser();
 
   // Use Clerk user data - only fall back to mock in development
   const user = clerkUser ? {

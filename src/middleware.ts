@@ -32,7 +32,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Check admin routes
     if (isAdminRoute(req)) {
-      const userRole = sessionClaims?.metadata?.role;
+      const userRole = (sessionClaims?.metadata as { role?: string })?.role;
 
       // Redirect non-admin users away from admin routes
       if (userRole !== 'admin') {

@@ -1,0 +1,27 @@
+{
+  "name": "Rides - Car Rental in Nigeria",
+  "short_name": "Rides",
+  "description": "Find and rent cars from trusted owners across Nigeria",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "oklch(0.45 0.15 165)",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["travel", "business"],
+  "lang": "en-NG",
+  "scope": "/",
+  "screenshots": []
+}

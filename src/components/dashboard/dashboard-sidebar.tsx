@@ -36,9 +36,9 @@ import {
 interface NavigationItem {
   name: string;
   href: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   badge?: number;
-  roles: ('seller' | 'buyer')[];
+  roles: ('admin' | 'seller' | 'buyer')[];
 }
 
 // Navigation items with role-based visibility

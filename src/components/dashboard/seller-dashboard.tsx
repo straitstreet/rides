@@ -140,7 +140,7 @@ export function SellerDashboard({ user }: SellerDashboardProps) {
             Welcome back, {user.firstName}!
           </h1>
           <p className="text-gray-600 mt-1">
-            Here's what's happening with your car rental business
+            Here&apos;s what&apos;s happening with your car rental business
           </p>
         </div>
 

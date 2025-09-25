@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="28" fill="oklch(0.45 0.15 165)"/>
+
+  <!-- Car icon - centered and scaled for favicon -->
+  <path d="M16 26C16 24.8954 16.8954 24 18 24H30L32 20H36L38 24H46C47.1046 24 48 24.8954 48 26V42C48 43.1046 47.1046 44 46 44H44C44 46.2091 42.2091 48 40 48C37.7909 48 36 46.2091 36 44H28C28 46.2091 26.2091 48 24 48C21.7909 48 20 46.2091 20 44H18C16.8954 44 16 43.1046 16 42V26Z"
+        fill="white"/>
+
+  <!-- Car windows -->
+  <path d="M20 28H44V36H20V28Z" fill="oklch(0.45 0.15 165)" opacity="0.3"/>
+
+  <!-- Car wheels -->
+  <circle cx="24" cy="44" r="3" fill="oklch(0.25 0.04 160)"/>
+  <circle cx="40" cy="44" r="3" fill="oklch(0.25 0.04 160)"/>
+</svg>

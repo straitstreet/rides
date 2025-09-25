@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { getCurrentUser } from '@/lib/auth';
+import { getMockUser } from '@/lib/auth';
 
 /**
  * AdminHeader Component
@@ -39,7 +39,7 @@ import { getCurrentUser } from '@/lib/auth';
  */
 export function AdminHeader() {
   // Get current user information (will be replaced with actual auth)
-  const user = getCurrentUser();
+  const user = getMockUser();
 
   // State for mobile menu visibility
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

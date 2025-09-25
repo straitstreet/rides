@@ -1,0 +1,26 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}'
+      - '--build-arg'
+      - 'CLERK_SECRET_KEY=${_CLERK_SECRET_KEY}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=${_NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY}'
+      - '--build-arg'
+      - 'PAYSTACK_SECRET_KEY=${_PAYSTACK_SECRET_KEY}'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/rides-app'
+      - '.'
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/rides-app']
+
+substitutions:
+  _NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_ZXF1YWwtZ3JvdXBlci05MS5jbGVyay5hY2NvdW50cy5kZXYk'
+  _CLERK_SECRET_KEY: 'sk_test_KJyJU7AmhlzJVTMLskCtq9kaWGbOcSc8mE0bhp2dUW'
+  _NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: 'pk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb'
+  _PAYSTACK_SECRET_KEY: 'sk_test_e3c3dda5f25089e0c664995182e29d474ce5dbbb'
+
+images:
+  - 'gcr.io/$PROJECT_ID/rides-app'

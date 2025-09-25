@@ -1,0 +1,21 @@
+<svg width="160" height="60" viewBox="0 0 160 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for the car icon -->
+  <circle cx="30" cy="30" r="24" fill="oklch(0.45 0.15 165)" opacity="0.1"/>
+
+  <!-- Car icon - simplified and clean -->
+  <path d="M12 22C12 20.8954 12.8954 20 14 20H26L28 16H32L34 20H46C47.1046 20 48 20.8954 48 22V38C48 39.1046 47.1046 40 46 40H44C44 42.2091 42.2091 44 40 44C37.7909 44 36 42.2091 36 40H24C24 42.2091 22.2091 44 20 44C17.7909 44 16 42.2091 16 40H14C12.8954 40 12 39.1046 12 38V22Z"
+        fill="oklch(0.45 0.15 165)"/>
+
+  <!-- Car windows -->
+  <path d="M16 24H44V32H16V24Z" fill="white" opacity="0.3"/>
+
+  <!-- Car wheels -->
+  <circle cx="20" cy="40" r="3" fill="oklch(0.25 0.04 160)"/>
+  <circle cx="40" cy="40" r="3" fill="oklch(0.25 0.04 160)"/>
+
+  <!-- Text: "rides" -->
+  <text x="66" y="38" font-family="Space Grotesk, monospace" font-size="24" font-weight="600" fill="oklch(0.15 0.05 150)">rides</text>
+
+  <!-- Subtle accent line under text -->
+  <rect x="66" y="42" width="40" height="2" fill="oklch(0.45 0.15 165)" opacity="0.3"/>
+</svg>
