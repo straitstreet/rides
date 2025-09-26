@@ -25,6 +25,8 @@ For manual setup or advanced configuration, see the [Manual Setup](#manual-setup
 
 Rides is a modern car rental platform that connects car owners with renters across Nigeria. The platform provides a seamless experience for both car owners looking to monetize their vehicles and travelers needing reliable transportation.
 
+🌐 **Live Demo**: [https://naija-rides-app-53hiswdaka-uc.a.run.app](https://naija-rides-app-53hiswdaka-uc.a.run.app)
+
 ### Key Features
 - **🗺️ Google Maps Integration**: Location autocomplete and interactive maps
 - **📱 Progressive Web App**: Offline capability and mobile-first design
@@ -326,6 +328,12 @@ Deploy to Google Cloud Platform with one command:
 # Deploy to production
 PROJECT_ID=your-project ./deploy.sh
 ```
+
+**✅ Successfully Deployed**: This application is currently running in production at:
+- **Production URL**: [https://naija-rides-app-53hiswdaka-uc.a.run.app](https://naija-rides-app-53hiswdaka-uc.a.run.app)
+- **Platform**: Google Cloud Run (Serverless)
+- **Region**: us-central1
+- **Status**: ✅ Active and ready for production use
 
 ### Manual Deployment
 

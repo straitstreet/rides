@@ -79,9 +79,9 @@ else
     echo "✅ Google Maps API key already exists in Secret Manager"
 fi
 
-# Build and deploy using Cloud Build
+# Build and deploy using Cloud Build with cloudbuild.yaml
 echo "🏗️  Building application with Cloud Build..."
-gcloud builds submit --tag gcr.io/$PROJECT_ID/rides-app --project=$PROJECT_ID
+gcloud builds submit --config=cloudbuild.yaml --project=$PROJECT_ID
 
 # Deploy to Cloud Run with secrets
 echo "🚀 Deploying to Cloud Run with Secret Manager integration..."

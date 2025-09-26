@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Car, MapPin, Search, Star, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { sampleCars } from '@/lib/seed-data';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { BookingModal } from '@/components/booking-modal';
@@ -43,6 +42,10 @@ export default function Home() {
       setSelectedCar(car);
       setIsBookingModalOpen(true);
     }
+  };
+
+  const handleCardClick = (carId: string) => {
+    window.location.href = `/cars/${carId}`;
   };
 
   const handleCloseBookingModal = () => {
@@ -154,7 +157,8 @@ export default function Home() {
       </section>
 
       {/* Cars Grid */}
-      <section className="max-w-7xl mx-auto px-6 pb-16">
+      <section className="relative bg-gradient-to-b from-gray-50/50 via-white to-white py-16">
+        <div className="max-w-7xl mx-auto px-6">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2 font-mono tracking-tight">available now</h2>
           <p className="text-gray-600">
@@ -162,52 +166,69 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" role="grid" aria-label="Available cars">
-          {sampleCars.slice(0, 12).map((car) => (
-            <Card key={car.id} className="overflow-hidden hover:shadow-md transition-all duration-200 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 group flex flex-col" role="gridcell">
-              <CardHeader className="p-0">
-                <div className="h-36 relative bg-gray-100">
-                  <Image
-                    src={car.image}
-                    alt={`${car.name} - ${car.location}`}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                  />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" role="grid" aria-label="Available cars">
+          {sampleCars.slice(0, 8).map((car) => (
+            <div
+              key={car.id}
+              className="group relative bg-white/90 rounded-2xl overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-gray-200/20 hover:border-primary/20 transition-all duration-500 hover:-translate-y-1 border border-gray-100 cursor-pointer"
+              role="gridcell"
+              onClick={() => handleCardClick(car.id)}
+            >
+              {/* Image Container */}
+              <div className="relative h-40 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                <Image
+                  src={car.image}
+                  alt={`${car.name} - ${car.location}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                />
+                {/* Overlay for better text contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+
+                {/* Rating Badge */}
+                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-2 py-1 flex items-center space-x-1 shadow-sm" aria-label={`Rating: ${car.rating} out of 5 stars`}>
+                  <Star className="h-3 w-3 text-yellow-500 fill-current" aria-hidden="true" />
+                  <span className="text-xs font-medium text-gray-900">{car.rating}</span>
                 </div>
-              </CardHeader>
-              <CardContent className="p-3 flex-1 flex flex-col justify-between min-h-[100px]">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-sm font-mono truncate pr-2 flex-1">{car.name.toLowerCase()}</h3>
-                    <div className="flex items-center space-x-1 flex-shrink-0" aria-label={`Rating: ${car.rating} out of 5 stars`}>
-                      <Star className="h-3 w-3 text-yellow-400 fill-current" aria-hidden="true" />
-                      <span className="text-xs text-gray-600">{car.rating}</span>
-                    </div>
-                  </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-3 space-y-2">
+                {/* Car Name */}
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-base text-gray-900 font-mono tracking-tight leading-tight">
+                    {car.name.toLowerCase()}
+                  </h3>
                   <div className="flex items-center text-gray-500">
-                    <MapPin className="h-3 w-3 mr-1 flex-shrink-0" aria-hidden="true" />
-                    <span className="text-xs truncate">{car.location.toLowerCase()}</span>
+                    <MapPin className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" aria-hidden="true" />
+                    <span className="text-sm">{car.location.toLowerCase()}</span>
                   </div>
                 </div>
-                <div className="flex justify-between items-center mt-3">
-                  <div className="flex-1">
-                    <div className="text-base font-bold text-primary font-mono" aria-label={`Price: ${car.price.toLocaleString()} naira per day`}>
+
+                {/* Price and Action */}
+                <div className="flex justify-between items-end">
+                  <div>
+                    <div className="text-xl font-bold text-gray-900 font-mono" aria-label={`Price: ${car.price.toLocaleString()} naira per day`}>
                       ₦{car.price.toLocaleString()}
                     </div>
-                    <div className="text-xs text-gray-500">/day</div>
+                    <div className="text-xs text-gray-500 font-medium">/day</div>
                   </div>
+
                   <Button
-                    size="sm"
-                    onClick={() => handleBookCar(car.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBookCar(car.id);
+                    }}
                     aria-label={`Book ${car.name} now`}
-                    className="text-xs px-3 py-1 h-7 flex-shrink-0"
+                    className="px-4 py-2 text-sm font-medium rounded-lg bg-primary hover:bg-primary/90 transition-colors duration-200"
                   >
                     book
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+            </div>
           ))}
         </div>
 
@@ -216,6 +237,7 @@ export default function Home() {
           <Button variant="outline" asChild>
             <Link href="/cars">view all cars</Link>
           </Button>
+        </div>
         </div>
       </section>
 

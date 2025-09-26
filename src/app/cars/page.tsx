@@ -41,7 +41,11 @@ export default function CarsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sampleCars.map((car) => (
-            <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer">
+            <Card
+              key={car.id}
+              className="overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+              onClick={() => window.location.href = `/cars/${car.id}`}
+            >
               <CardHeader className="p-0">
                 <div className="h-48 relative">
                   <Image
@@ -76,7 +80,7 @@ export default function CarsPage() {
                   <span className="text-2xl font-bold text-primary">₦{car.price.toLocaleString()}</span>
                   <span className="text-gray-600">/day</span>
                 </div>
-                <Button size="sm">Book Now</Button>
+                <Button size="sm" onClick={(e) => e.stopPropagation()}>Book Now</Button>
               </CardFooter>
             </Card>
           ))}

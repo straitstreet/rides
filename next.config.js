@@ -16,6 +16,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'img.clerk.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      },
     ],
   },
   async headers() {
@@ -27,7 +31,7 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.straitstreet-rides.com https://js.paystack.co https://www.googletagmanager.com https://maps.googleapis.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.straitstreet-rides.com https://equal-grouper-91.clerk.accounts.dev https://js.paystack.co https://www.googletagmanager.com https://maps.googleapis.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' https://fonts.gstatic.com",
