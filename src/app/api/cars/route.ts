@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { eq, and, gte, lte, ilike, desc } from 'drizzle-orm';
-import { db } from '@/lib/db';
+import { eq, and, gte, lte, ilike, desc, count } from 'drizzle-orm';
+import { getDatabase } from '@/lib/db';
 import { cars, users } from '@/lib/db/schema';
 import { createApiHandler, validateBody, validateQuery, throwApiError } from '@/lib/api/middleware';
 import { createCarSchema, carQuerySchema } from '@/lib/api/validation';
@@ -9,7 +9,7 @@ import { getCurrentUser } from '@/lib/auth-server';
 // GET /api/cars - List cars with filtering and pagination
 export const GET = createApiHandler({
   rateLimit: { max: 100, windowMs: 60 * 1000 }, // 100 requests per minute
-})(async (req: NextRequest) => {
+  handler: async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const query = validateQuery(carQuerySchema, searchParams);
 
@@ -46,7 +46,7 @@ export const GET = createApiHandler({
     const offset = (query.page - 1) * query.limit;
 
     // Get cars with owner information
-    const result = await db
+    const result = await getDatabase()
       .select({
         id: cars.id,
         make: cars.make,
@@ -83,12 +83,12 @@ export const GET = createApiHandler({
       .offset(offset);
 
     // Get total count for pagination
-    const [{ count }] = await db
-      .select({ count: cars.id })
+    const [{ totalCount }] = await getDatabase()
+      .select({ totalCount: count() })
       .from(cars)
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
-    const totalPages = Math.ceil((count as number) / query.limit);
+    const totalPages = Math.ceil((totalCount as number) / query.limit);
 
     return NextResponse.json({
       cars: result.map(car => ({
@@ -101,13 +101,14 @@ export const GET = createApiHandler({
       pagination: {
         page: query.page,
         limit: query.limit,
-        total: count,
+        total: totalCount,
         totalPages,
       },
     });
   } catch (error) {
     console.error('Error fetching cars:', error);
     throwApiError('Failed to fetch cars', 'DATABASE_ERROR', 500);
+  }
   }
 });
 
@@ -116,7 +117,7 @@ export const POST = createApiHandler({
   requireAuth: true,
   allowedRoles: ['seller', 'admin'],
   rateLimit: { max: 10, windowMs: 60 * 1000 }, // 10 requests per minute
-})(async (req: NextRequest) => {
+  handler: async (req: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
@@ -125,7 +126,7 @@ export const POST = createApiHandler({
   const body = await validateBody(createCarSchema)(req);
 
   try {
-    const [newCar] = await db
+    const [newCar] = await getDatabase()
       .insert(cars)
       .values({
         ...body,
@@ -147,19 +148,21 @@ export const POST = createApiHandler({
         longitude: newCar.longitude ? parseFloat(newCar.longitude) : null,
       }
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const dbError = error as { code?: string; detail?: string; };
     console.error('Error creating car:', error);
 
     // Handle unique constraint violations
-    if (error.code === '23505') {
-      if (error.detail?.includes('plate_number')) {
+    if (dbError.code === '23505') {
+      if (dbError.detail?.includes('plate_number')) {
         throwApiError('Plate number already exists', 'DUPLICATE_PLATE_NUMBER', 409);
       }
-      if (error.detail?.includes('vin')) {
+      if (dbError.detail?.includes('vin')) {
         throwApiError('VIN already exists', 'DUPLICATE_VIN', 409);
       }
     }
 
     throwApiError('Failed to create car listing', 'DATABASE_ERROR', 500);
+  }
   }
 });

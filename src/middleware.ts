@@ -25,9 +25,9 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Check if route requires authentication
   if (isProtectedRoute(req)) {
-    // Redirect to sign-in if not authenticated
+    // Redirect to register if not authenticated (invite-first system)
     if (!userId) {
-      return NextResponse.redirect(new URL('/sign-in', req.url));
+      return NextResponse.redirect(new URL('/register', req.url));
     }
 
     // Check admin routes

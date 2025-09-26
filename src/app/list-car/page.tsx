@@ -1,14 +1,102 @@
 'use client';
 
-import { Car, Upload, MapPin, Calendar, Shield, DollarSign } from 'lucide-react';
+import { useState } from 'react';
+import { Car, MapPin, Calendar, Shield, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { MultipleImageUpload } from '@/components/ui/multiple-image-upload';
+import { useCarImages } from '@/hooks/use-car-images';
 import Link from 'next/link';
 
 export default function ListCarPage() {
+  const [formData, setFormData] = useState({
+    make: '',
+    model: '',
+    year: '',
+    color: '',
+    location: '',
+    price: '',
+    description: '',
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addNewImages, newImages, error: imageError, clearError } = useCarImages({});
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleImagesChange = (files: File[], primaryIndex?: number) => {
+    addNewImages(files, primaryIndex);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newImages.length === 0) {
+      alert('Please upload at least one image of your car');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Create car listing
+      const carResponse = await fetch('/api/cars', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          year: parseInt(formData.year),
+          dailyRate: parseFloat(formData.price),
+          fuelType: 'petrol', // Default - could be a form field
+          transmission: 'automatic', // Default - could be a form field
+          seats: 5, // Default - could be a form field
+          category: 'economy', // Default - could be a form field
+          plateNumber: 'TEMP-' + Date.now(), // Temporary - should be a form field
+        }),
+      });
+
+      if (!carResponse.ok) {
+        throw new Error('Failed to create car listing');
+      }
+
+      const { car } = await carResponse.json();
+
+      // Upload images
+      const formDataForImages = new FormData();
+      newImages.forEach((file, index) => {
+        formDataForImages.append(`image${index}`, file);
+      });
+      formDataForImages.append('primaryImageIndex', '0');
+
+      const imageResponse = await fetch(`/api/cars/${car.id}/images`, {
+        method: 'POST',
+        body: formDataForImages,
+      });
+
+      if (!imageResponse.ok) {
+        throw new Error('Failed to upload images');
+      }
+
+      alert('Car listed successfully!');
+      // Redirect to dashboard or car listing
+      window.location.href = '/dashboard';
+
+    } catch (error) {
+      console.error('Error listing car:', error);
+      alert(error instanceof Error ? error.message : 'Failed to list car');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b">
@@ -58,63 +146,141 @@ export default function ListCarPage() {
           <CardHeader>
             <CardTitle>Car Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="make">Make *</Label>
+                  <Input
+                    id="make"
+                    placeholder="e.g., Toyota"
+                    value={formData.make}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="model">Model *</Label>
+                  <Input
+                    id="model"
+                    placeholder="e.g., Camry"
+                    value={formData.model}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="year">Year *</Label>
+                  <Input
+                    id="year"
+                    type="number"
+                    placeholder="2020"
+                    value={formData.year}
+                    onChange={handleInputChange}
+                    min="1900"
+                    max={new Date().getFullYear() + 1}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="color">Color *</Label>
+                  <Input
+                    id="color"
+                    placeholder="e.g., Black"
+                    value={formData.color}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
-                <Label htmlFor="make">Make</Label>
-                <Input id="make" placeholder="e.g., Toyota" />
+                <Label htmlFor="location">Location *</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="location"
+                    className="pl-10"
+                    placeholder="City, State"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
+
               <div>
-                <Label htmlFor="model">Model</Label>
-                <Input id="model" placeholder="e.g., Camry" />
+                <Label htmlFor="price">Daily Rate (₦) *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  placeholder="15000"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  min="1000"
+                  required
+                />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="year">Year</Label>
-                <Input id="year" type="number" placeholder="2020" />
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe your car, its features, and any special instructions..."
+                  rows={4}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                />
               </div>
+
               <div>
-                <Label htmlFor="color">Color</Label>
-                <Input id="color" placeholder="e.g., Black" />
+                <Label>Car Photos *</Label>
+                <p className="text-sm text-gray-600 mb-3">
+                  Upload up to 10 high-quality photos of your car. The first photo will be used as the main image.
+                </p>
+
+                {imageError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <p className="text-red-600 text-sm">{imageError}</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearError}
+                      className="mt-2 text-red-600 hover:text-red-700"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                )}
+
+                <MultipleImageUpload
+                  onImagesChange={handleImagesChange}
+                  maxImages={10}
+                  maxFileSize={5 * 1024 * 1024} // 5MB
+                  acceptedTypes={['image/jpeg', 'image/png', 'image/webp']}
+                  disabled={isSubmitting}
+                />
               </div>
-            </div>
 
-            <div>
-              <Label htmlFor="location">Location</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input id="location" className="pl-10" placeholder="City, State" />
-              </div>
-            </div>
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isSubmitting || newImages.length === 0}
+              >
+                {isSubmitting ? 'Listing Car...' : 'List My Car'}
+              </Button>
 
-            <div>
-              <Label htmlFor="price">Daily Rate (₦)</Label>
-              <Input id="price" type="number" placeholder="15000" />
-            </div>
-
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Describe your car, its features, and any special instructions..."
-                rows={4}
-              />
-            </div>
-
-            <div>
-              <Label>Photos</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">Upload photos of your car</p>
-                <p className="text-sm text-gray-500">Drag and drop or click to browse</p>
-              </div>
-            </div>
-
-            <Button className="w-full" size="lg">
-              List My Car
-            </Button>
+              {newImages.length === 0 && (
+                <p className="text-sm text-amber-600 text-center">
+                  Please upload at least one photo of your car to continue
+                </p>
+              )}
+            </form>
           </CardContent>
         </Card>
 

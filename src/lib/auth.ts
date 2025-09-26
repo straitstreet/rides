@@ -17,10 +17,18 @@ export interface User {
 }
 
 /**
- * For client-side use - Mock user for development
+ * For client-side use - Mock user for development ONLY
  * In production, use useUser() from @clerk/nextjs
+ * SECURITY: This function should NEVER be used in production
  */
 export const getMockUser = (): User => {
+  // CRITICAL: Ensure this is never used in production
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('getMockUser() cannot be used in production environment');
+  }
+
+  console.warn('🚨 WARNING: Using mock authentication - development only!');
+
   return {
     id: '1',
     email: 'user@example.com',

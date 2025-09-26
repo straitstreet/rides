@@ -199,6 +199,25 @@ export const nigerianCities = [
   'Akure'
 ];
 
+// Nigerian cities with their actual coordinates
+export const nigerianCitiesCoordinates: { [key: string]: { lat: number; lng: number } } = {
+  'Lagos': { lat: 6.5244, lng: 3.3792 },
+  'Abuja': { lat: 9.0765, lng: 7.3986 },
+  'Port Harcourt': { lat: 4.8156, lng: 7.0498 },
+  'Kano': { lat: 12.0022, lng: 8.5920 },
+  'Ibadan': { lat: 7.3775, lng: 3.9470 },
+  'Benin City': { lat: 6.3350, lng: 5.6037 },
+  'Jos': { lat: 9.8965, lng: 8.8583 },
+  'Ilorin': { lat: 8.5000, lng: 4.5500 },
+  'Owerri': { lat: 5.4840, lng: 7.0351 },
+  'Calabar': { lat: 4.9517, lng: 8.3220 },
+  'Enugu': { lat: 6.4474, lng: 7.4987 },
+  'Kaduna': { lat: 10.5105, lng: 7.4165 },
+  'Zaria': { lat: 11.1112, lng: 7.7200 },
+  'Warri': { lat: 5.5160, lng: 5.7500 },
+  'Akure': { lat: 7.2571, lng: 5.2058 }
+};
+
 export const carCategories = [
   { id: 'economy', name: 'Economy', description: 'Budget-friendly cars for everyday use' },
   { id: 'compact', name: 'Compact', description: 'Small cars perfect for city driving' },

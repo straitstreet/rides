@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { NextResponse } from 'next/server';
+import { getDatabase } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 
 // GET /api/health - Health check endpoint
 export async function GET() {
   try {
     // Check database connectivity
-    await db.select().from(users).limit(1);
+    await getDatabase().select().from(users).limit(1);
 
     return NextResponse.json({
       status: 'healthy',

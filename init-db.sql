@@ -7,4 +7,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Set timezone
 SET timezone = 'UTC';
 
--- Database is already owned by postgres user, no additional grants needed
+-- Ensure postgres user exists with proper permissions
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'postgres') THEN
+        CREATE ROLE postgres WITH LOGIN SUPERUSER CREATEDB CREATEROLE PASSWORD 'postgres';
+    END IF;
+END
+$$;
+
+-- Grant all privileges on database
+GRANT ALL PRIVILEGES ON DATABASE rides_db TO postgres;

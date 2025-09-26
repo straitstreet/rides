@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { eq, and, or } from 'drizzle-orm';
-import { db } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { getDatabase } from '@/lib/db';
 import { bookings, cars, users } from '@/lib/db/schema';
 import { createApiHandler, validateBody, throwApiError } from '@/lib/api/middleware';
 import { updateBookingSchema } from '@/lib/api/validation';
@@ -10,19 +10,19 @@ import { getCurrentUser } from '@/lib/auth-server';
 export const GET = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 60, windowMs: 60 * 1000 },
-})(async (req: NextRequest, { params }: { params: { id: string } }) => {
+  handler: async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
   }
 
-  const bookingId = params.id;
+  const { id: bookingId } = await params;
   if (!bookingId) {
     throwApiError('Booking ID is required', 'MISSING_BOOKING_ID', 400);
   }
 
   try {
-    const [result] = await db
+    const [result] = await getDatabase()
       .select({
         booking: bookings,
         car: {
@@ -78,19 +78,19 @@ export const GET = createApiHandler({
     console.error('Error fetching booking:', error);
     throwApiError('Failed to fetch booking', 'DATABASE_ERROR', 500);
   }
-});
+}});
 
 // PUT /api/bookings/[id] - Update booking
 export const PUT = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 20, windowMs: 60 * 1000 },
-})(async (req: NextRequest, { params }: { params: { id: string } }) => {
+  handler: async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
   }
 
-  const bookingId = params.id;
+  const { id: bookingId } = await params;
   if (!bookingId) {
     throwApiError('Booking ID is required', 'MISSING_BOOKING_ID', 400);
   }
@@ -99,7 +99,7 @@ export const PUT = createApiHandler({
 
   try {
     // Get existing booking with car info
-    const [existing] = await db
+    const [existing] = await getDatabase()
       .select({
         booking: bookings,
         car: cars,
@@ -159,7 +159,7 @@ export const PUT = createApiHandler({
     }
 
     // Prepare update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     Object.entries(body).forEach(([key, value]) => {
       if (value !== undefined) {
         updateData[key] = value;
@@ -168,14 +168,14 @@ export const PUT = createApiHandler({
 
     updateData.updatedAt = new Date();
 
-    const [updatedBooking] = await db
+    await getDatabase()
       .update(bookings)
       .set(updateData)
       .where(eq(bookings.id, bookingId))
       .returning();
 
     // Fetch complete updated booking
-    const [completeBooking] = await db
+    const [completeBooking] = await getDatabase()
       .select({
         booking: bookings,
         car: {
@@ -215,26 +215,26 @@ export const PUT = createApiHandler({
     console.error('Error updating booking:', error);
     throwApiError('Failed to update booking', 'DATABASE_ERROR', 500);
   }
-});
+}});
 
 // DELETE /api/bookings/[id] - Cancel/Delete booking
 export const DELETE = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 10, windowMs: 60 * 1000 },
-})(async (req: NextRequest, { params }: { params: { id: string } }) => {
+  handler: async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
   }
 
-  const bookingId = params.id;
+  const { id: bookingId } = await params;
   if (!bookingId) {
     throwApiError('Booking ID is required', 'MISSING_BOOKING_ID', 400);
   }
 
   try {
     // Get existing booking
-    const [existing] = await db
+    const [existing] = await getDatabase()
       .select()
       .from(bookings)
       .where(eq(bookings.id, bookingId))
@@ -258,11 +258,11 @@ export const DELETE = createApiHandler({
       );
     }
 
-    await db.delete(bookings).where(eq(bookings.id, bookingId));
+    await getDatabase().delete(bookings).where(eq(bookings.id, bookingId));
 
     return NextResponse.json({ message: 'Booking deleted successfully' });
   } catch (error) {
     console.error('Error deleting booking:', error);
     throwApiError('Failed to delete booking', 'DATABASE_ERROR', 500);
   }
-});
+}});

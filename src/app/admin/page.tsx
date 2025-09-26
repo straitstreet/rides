@@ -94,12 +94,12 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-gray-600">{stat.title}</p>
                   <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className={`text-sm ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-sm ${stat.trend === 'up' ? 'text-primary' : 'text-red-600'}`}>
                     {stat.change} from last month
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${stat.trend === 'up' ? 'bg-green-100' : 'bg-red-100'}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
+                <div className={`p-3 rounded-full ${stat.trend === 'up' ? 'bg-primary/10' : 'bg-red-100'}`}>
+                  <stat.icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-primary' : 'text-red-600'}`} />
                 </div>
               </div>
             </CardContent>
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
               {recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50">
                   <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.status === 'success' ? 'bg-green-500' :
+                    activity.status === 'success' ? 'bg-primary' :
                     activity.status === 'warning' ? 'bg-yellow-500' :
                     activity.status === 'error' ? 'bg-red-500' : 'bg-blue-500'
                   }`} />

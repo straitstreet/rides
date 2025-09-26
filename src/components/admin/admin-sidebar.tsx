@@ -26,7 +26,8 @@ import {
   Settings,
   BarChart3,
   FileText,
-  Shield
+  Shield,
+  Mail
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -47,6 +48,11 @@ const navigationItems: NavigationItem[] = [
     name: 'Users',
     href: '/admin/users',
     icon: Users,
+  },
+  {
+    name: 'Invites',
+    href: '/admin/invites',
+    icon: Mail,
   },
   {
     name: 'Cars',

@@ -1,6 +1,6 @@
 {
-  "name": "Rides - Car Rental in Nigeria",
-  "short_name": "Rides",
+  "name": "Ride Flex - Car Rental in Nigeria",
+  "short_name": "Ride Flex",
   "description": "Find and rent cars from trusted owners across Nigeria",
   "start_url": "/",
   "display": "standalone",

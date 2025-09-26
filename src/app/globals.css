@@ -162,4 +162,73 @@
     -webkit-user-select: none;
     user-select: none;
   }
+
+  /* Clerk Modal Styling Integration */
+  .cl-modalContent {
+    @apply bg-background border border-border shadow-2xl;
+  }
+
+  .cl-card {
+    @apply bg-background border border-border shadow-2xl;
+  }
+
+  .cl-headerTitle {
+    @apply text-foreground font-semibold;
+  }
+
+  .cl-headerSubtitle {
+    @apply text-muted-foreground;
+  }
+
+  .cl-formButtonPrimary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Hide email/password form elements for Google-only auth */
+  .cl-formFieldInput {
+    display: none !important;
+  }
+
+  .cl-formFieldLabel {
+    display: none !important;
+  }
+
+  .cl-footerActionLink {
+    display: none !important;
+  }
+
+  .cl-dividerLine,
+  .cl-dividerText {
+    display: none !important;
+  }
+
+  .cl-alternativeMethodsBlockButton {
+    display: none !important;
+  }
+
+  /* Style the Google sign-in button */
+  .cl-socialButtonsBlockButton {
+    @apply bg-background border border-border text-foreground hover:bg-muted hover:border-primary;
+    transition: all 0.2s ease-in-out;
+    width: 100% !important;
+    padding: 0.875rem 1rem !important;
+    font-weight: 500 !important;
+  }
+
+  .cl-socialButtonsBlockButtonText {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+  }
+
+  .cl-modalCloseButton {
+    @apply text-muted-foreground hover:text-foreground;
+    transition: color 0.2s ease-in-out;
+  }
+
+  /* Improve modal backdrop */
+  .cl-modalBackdrop {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.25);
+  }
 }

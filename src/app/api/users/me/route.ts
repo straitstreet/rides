@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db';
+import { getDatabase } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { createApiHandler, validateBody, throwApiError } from '@/lib/api/middleware';
 import { updateUserSchema } from '@/lib/api/validation';
@@ -10,7 +10,7 @@ import { getCurrentUser } from '@/lib/auth-server';
 export const GET = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 60, windowMs: 60 * 1000 },
-})(async () => {
+  handler: async () => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
@@ -18,7 +18,7 @@ export const GET = createApiHandler({
 
   try {
     // Get user from database with additional details
-    const [dbUser] = await db
+    const [dbUser] = await getDatabase()
       .select()
       .from(users)
       .where(eq(users.id, user.id))
@@ -26,7 +26,7 @@ export const GET = createApiHandler({
 
     if (!dbUser) {
       // User exists in Clerk but not in our database - create them
-      const [newUser] = await db
+      const [newUser] = await getDatabase()
         .insert(users)
         .values({
           id: user.id,
@@ -46,13 +46,13 @@ export const GET = createApiHandler({
     console.error('Error fetching user profile:', error);
     throwApiError('Failed to fetch user profile', 'DATABASE_ERROR', 500);
   }
-});
+}});
 
 // PUT /api/users/me - Update current user profile
 export const PUT = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 20, windowMs: 60 * 1000 },
-})(async (req: NextRequest) => {
+  handler: async (req: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
@@ -73,7 +73,7 @@ export const PUT = createApiHandler({
     updateData.updatedAt = new Date();
 
     // Check if user exists in database
-    const [existingUser] = await db
+    const [existingUser] = await getDatabase()
       .select()
       .from(users)
       .where(eq(users.id, user.id))
@@ -83,7 +83,7 @@ export const PUT = createApiHandler({
 
     if (!existingUser) {
       // Create user if doesn't exist
-      [updatedUser] = await db
+      [updatedUser] = await getDatabase()
         .insert(users)
         .values({
           id: user.id,
@@ -97,7 +97,7 @@ export const PUT = createApiHandler({
         .returning();
     } else {
       // Update existing user
-      [updatedUser] = await db
+      [updatedUser] = await getDatabase()
         .update(users)
         .set(updateData)
         .where(eq(users.id, user.id))
@@ -121,4 +121,4 @@ export const PUT = createApiHandler({
 
     throwApiError('Failed to update user profile', 'DATABASE_ERROR', 500);
   }
-});
+}});

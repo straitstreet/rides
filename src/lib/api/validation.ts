@@ -104,6 +104,44 @@ export const fileUploadSchema = z.object({
   folder: z.string().optional(),
 });
 
+// Multiple image upload validation (max 10 images)
+export const multipleImageUploadSchema = z.object({
+  images: z.array(z.instanceof(File))
+    .min(1, 'At least one image is required')
+    .max(10, 'Maximum 10 images allowed')
+    .refine(
+      (files) => files.every(file =>
+        file.type.startsWith('image/') &&
+        file.size <= 5 * 1024 * 1024 // 5MB per image
+      ),
+      'All files must be images under 5MB'
+    ),
+  carId: z.string().uuid('Invalid car ID').optional(),
+  primaryImageIndex: z.number().int().min(0).max(9).optional(),
+});
+
+// Car image management
+export const carImageSchema = z.object({
+  id: z.string().uuid(),
+  carId: z.string().uuid(),
+  imageUrl: z.string().url(),
+  isPrimary: z.boolean(),
+  createdAt: z.string().datetime(),
+});
+
+export const updateCarImagesSchema = z.object({
+  imagesToDelete: z.array(z.string().uuid()).optional(),
+  newImages: z.array(z.instanceof(File)).max(10).optional(),
+  primaryImageId: z.string().uuid().optional(),
+}).refine(
+  (data) => {
+    // Ensure we don't exceed 10 images total
+    const newCount = data.newImages?.length || 0;
+    return newCount <= 10; // Will be validated against existing count in endpoint
+  },
+  'Total images cannot exceed 10'
+);
+
 // Pagination helpers
 export const paginationSchema = z.object({
   page: z.number().int().min(1).default(1),
@@ -118,3 +156,6 @@ export type UpdateBookingInput = z.infer<typeof updateBookingSchema>;
 export type BookingQueryInput = z.infer<typeof bookingQuerySchema>;
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
+export type MultipleImageUploadInput = z.infer<typeof multipleImageUploadSchema>;
+export type CarImageType = z.infer<typeof carImageSchema>;
+export type UpdateCarImagesInput = z.infer<typeof updateCarImagesSchema>;

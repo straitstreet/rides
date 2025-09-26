@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { sampleCars } from '@/lib/seed-data';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { BookingModal } from '@/components/booking-modal';
-import { LocationAutocomplete } from '@/components/maps';
+import { CityAutocomplete } from '@/components/city-autocomplete';
 // Helper function for role-based redirects
 const getRoleBasedRedirect = (role: 'admin' | 'seller' | 'buyer') => {
   switch (role) {
@@ -23,17 +23,44 @@ const getRoleBasedRedirect = (role: 'admin' | 'seller' | 'buyer') => {
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Helper functions for date handling
+const formatDateForInput = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getDefaultDates = () => {
+  const today = new Date();
+  const oneWeekFromToday = new Date();
+  oneWeekFromToday.setDate(today.getDate() + 7);
+
+  return {
+    pickup: formatDateForInput(today),
+    dropoff: formatDateForInput(oneWeekFromToday)
+  };
+};
+
 export default function Home() {
   const { user, isLoaded } = useUser();
+  const defaultDates = getDefaultDates();
   const [pickupLocation, setPickupLocation] = useState('');
-  const [pickupDate, setPickupDate] = useState('');
-  const [dropoffDate, setDropoffDate] = useState('');
+  const [pickupDate, setPickupDate] = useState(defaultDates.pickup);
+  const [dropoffDate, setDropoffDate] = useState(defaultDates.dropoff);
   const [selectedCar, setSelectedCar] = useState<typeof sampleCars[0] | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const handleSearch = () => {
-    // TODO: Implement search functionality
-    console.log('Searching for cars:', { pickupLocation, pickupDate, dropoffDate });
+    // Filter cars based on location and date availability
+    const searchParams = new URLSearchParams({
+      location: pickupLocation,
+      pickup: pickupDate,
+      dropoff: dropoffDate
+    });
+
+    // Navigate to cars page with search parameters
+    window.location.href = `/cars?${searchParams.toString()}`;
   };
 
   const handleBookCar = (carId: string) => {
@@ -60,8 +87,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-3">
-              <Car className="h-7 w-7 text-primary" />
-              <span className="text-xl font-bold font-mono text-gray-900 tracking-tight">rides</span>
+              <span className="text-xl font-bold font-mono text-gray-900 tracking-tight">Ride Flex</span>
             </div>
             <div className="flex items-center space-x-3">
               {isLoaded && user ? (
@@ -108,17 +134,11 @@ export default function Home() {
           {/* Compact Search Bar */}
           <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border p-4 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <LocationAutocomplete
+              <CityAutocomplete
                 placeholder="where?"
                 value={pickupLocation}
-                onChange={(value, place) => {
-                  setPickupLocation(value);
-                  if (place) {
-                    console.log('Selected place:', place);
-                  }
-                }}
+                onChange={setPickupLocation}
                 className="h-10 text-sm"
-                bias="nigeria"
               />
               <div className="relative">
                 <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" aria-hidden="true" />
@@ -157,7 +177,7 @@ export default function Home() {
       </section>
 
       {/* Cars Grid */}
-      <section className="relative bg-gradient-to-b from-gray-50/50 via-white to-white py-16">
+      <section className="relative bg-gradient-to-b from-gray-50/50 via-white to-white pt-4 pb-16">
         <div className="max-w-7xl mx-auto px-6">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2 font-mono tracking-tight">available now</h2>
@@ -294,8 +314,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Car className="h-6 w-6 text-primary" aria-hidden="true" />
-                <span className="text-lg font-bold font-mono">rides</span>
+                <span className="text-lg font-bold font-mono">Ride Flex</span>
               </div>
               <p className="text-gray-400 text-sm">
                 nigeria&apos;s trusted car rental platform connecting owners with travelers.
@@ -327,7 +346,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-6 pt-6 text-center text-gray-400 text-sm">
-            <p>&copy; 2024 rides. all rights reserved.</p>
+            <p>&copy; 2024 Ride Flex. all rights reserved.</p>
           </div>
         </div>
       </footer>

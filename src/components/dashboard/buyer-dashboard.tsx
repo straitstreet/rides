@@ -139,7 +139,7 @@ export function BuyerDashboard({ user }: BuyerDashboardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-primary/10 text-primary';
       case 'pending_payment':
         return 'bg-yellow-100 text-yellow-800';
       case 'completed':
@@ -196,12 +196,12 @@ export function BuyerDashboard({ user }: BuyerDashboardProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-gray-600">{stat.title}</p>
                   <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className={`text-sm ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-sm ${stat.trend === 'up' ? 'text-primary' : 'text-red-600'}`}>
                     {stat.change} {stat.description}
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${stat.trend === 'up' ? 'bg-green-100' : 'bg-red-100'}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
+                <div className={`p-3 rounded-full ${stat.trend === 'up' ? 'bg-primary/10' : 'bg-red-100'}`}>
+                  <stat.icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-primary' : 'text-red-600'}`} />
                 </div>
               </div>
             </CardContent>
@@ -321,7 +321,7 @@ export function BuyerDashboard({ user }: BuyerDashboardProps) {
                       <MapPin className="h-3 w-3 text-gray-400" />
                       <p className="text-xs text-gray-500 truncate">{car.location}</p>
                     </div>
-                    <p className="text-xs text-green-600 font-medium mt-1">
+                    <p className="text-xs text-primary font-medium mt-1">
                       ₦{car.price.toLocaleString()}/day
                     </p>
                   </div>

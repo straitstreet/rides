@@ -121,7 +121,7 @@ export function SellerDashboard({ user }: SellerDashboardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-primary/10 text-primary';
       case 'confirmed':
         return 'bg-blue-100 text-blue-800';
       case 'pending':
@@ -166,12 +166,12 @@ export function SellerDashboard({ user }: SellerDashboardProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-gray-600">{stat.title}</p>
                   <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className={`text-sm ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-sm ${stat.trend === 'up' ? 'text-primary' : 'text-red-600'}`}>
                     {stat.change} {stat.description}
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${stat.trend === 'up' ? 'bg-green-100' : 'bg-red-100'}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
+                <div className={`p-3 rounded-full ${stat.trend === 'up' ? 'bg-primary/10' : 'bg-red-100'}`}>
+                  <stat.icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-primary' : 'text-red-600'}`} />
                 </div>
               </div>
             </CardContent>

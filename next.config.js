@@ -2,6 +2,10 @@
 const nextConfig = {
   output: 'standalone',
   serverExternalPackages: ['postgres'],
+  // TypeScript errors will now fail the build - this is safer for production
+  // typescript: {
+  //   ignoreBuildErrors: false, // Default behavior - fail on type errors
+  // },
   images: {
     remotePatterns: [
       {

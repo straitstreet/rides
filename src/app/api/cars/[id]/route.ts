@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { eq, and } from 'drizzle-orm';
-import { db } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { getDatabase } from '@/lib/db';
 import { cars, users, carImages } from '@/lib/db/schema';
 import { createApiHandler, validateBody, throwApiError } from '@/lib/api/middleware';
 import { updateCarSchema } from '@/lib/api/validation';
@@ -9,8 +9,8 @@ import { getCurrentUser } from '@/lib/auth-server';
 // GET /api/cars/[id] - Get single car with details
 export const GET = createApiHandler({
   rateLimit: { max: 100, windowMs: 60 * 1000 },
-})(async (req: NextRequest, { params }: { params: { id: string } }) => {
-  const carId = params.id;
+  handler: async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+  const { id: carId } = await params;
 
   if (!carId) {
     throwApiError('Car ID is required', 'MISSING_CAR_ID', 400);
@@ -18,7 +18,7 @@ export const GET = createApiHandler({
 
   try {
     // Get car with owner and images
-    const result = await db
+    const result = await getDatabase()
       .select({
         car: cars,
         owner: {
@@ -41,7 +41,7 @@ export const GET = createApiHandler({
     const { car, owner } = result[0];
 
     // Get car images
-    const images = await db
+    const images = await getDatabase()
       .select()
       .from(carImages)
       .where(eq(carImages.carId, carId));
@@ -65,19 +65,19 @@ export const GET = createApiHandler({
     console.error('Error fetching car:', error);
     throwApiError('Failed to fetch car', 'DATABASE_ERROR', 500);
   }
-});
+}});
 
 // PUT /api/cars/[id] - Update car listing
 export const PUT = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 20, windowMs: 60 * 1000 },
-})(async (req: NextRequest, { params }: { params: { id: string } }) => {
+  handler: async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
   }
 
-  const carId = params.id;
+  const { id: carId } = await params;
   if (!carId) {
     throwApiError('Car ID is required', 'MISSING_CAR_ID', 400);
   }
@@ -86,7 +86,7 @@ export const PUT = createApiHandler({
 
   try {
     // Check if car exists and user owns it (or is admin)
-    const [existingCar] = await db
+    const [existingCar] = await getDatabase()
       .select()
       .from(cars)
       .where(eq(cars.id, carId))
@@ -102,7 +102,7 @@ export const PUT = createApiHandler({
     }
 
     // Prepare update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     Object.entries(body).forEach(([key, value]) => {
       if (value !== undefined) {
@@ -123,7 +123,7 @@ export const PUT = createApiHandler({
 
     updateData.updatedAt = new Date();
 
-    const [updatedCar] = await db
+    const [updatedCar] = await getDatabase()
       .update(cars)
       .set(updateData)
       .where(eq(cars.id, carId))
@@ -138,41 +138,42 @@ export const PUT = createApiHandler({
         longitude: updatedCar.longitude ? parseFloat(updatedCar.longitude) : null,
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const dbError = error as { code?: string; detail?: string; };
     console.error('Error updating car:', error);
 
     // Handle unique constraint violations
-    if (error.code === '23505') {
-      if (error.detail?.includes('plate_number')) {
+    if (dbError.code === '23505') {
+      if (dbError.detail?.includes('plate_number')) {
         throwApiError('Plate number already exists', 'DUPLICATE_PLATE_NUMBER', 409);
       }
-      if (error.detail?.includes('vin')) {
+      if (dbError.detail?.includes('vin')) {
         throwApiError('VIN already exists', 'DUPLICATE_VIN', 409);
       }
     }
 
     throwApiError('Failed to update car', 'DATABASE_ERROR', 500);
   }
-});
+}});
 
 // DELETE /api/cars/[id] - Delete car listing
 export const DELETE = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 10, windowMs: 60 * 1000 },
-})(async (req: NextRequest, { params }: { params: { id: string } }) => {
+  handler: async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
   }
 
-  const carId = params.id;
+  const { id: carId } = await params;
   if (!carId) {
     throwApiError('Car ID is required', 'MISSING_CAR_ID', 400);
   }
 
   try {
     // Check if car exists and user owns it (or is admin)
-    const [existingCar] = await db
+    const [existingCar] = await getDatabase()
       .select()
       .from(cars)
       .where(eq(cars.id, carId))
@@ -190,11 +191,11 @@ export const DELETE = createApiHandler({
     // TODO: Check for active bookings before deletion
     // For now, we'll just delete the car
 
-    await db.delete(cars).where(eq(cars.id, carId));
+    await getDatabase().delete(cars).where(eq(cars.id, carId));
 
     return NextResponse.json({ message: 'Car deleted successfully' });
   } catch (error) {
     console.error('Error deleting car:', error);
     throwApiError('Failed to delete car', 'DATABASE_ERROR', 500);
   }
-});
+}});

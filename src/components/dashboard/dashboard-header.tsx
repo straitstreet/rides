@@ -221,7 +221,7 @@ export function DashboardHeader() {
                         {user?.role}
                       </Badge>
                       {user?.isVerified && (
-                        <Badge variant="outline" className="text-green-600 border-green-600">
+                        <Badge variant="outline" className="text-primary border-primary">
                           Verified
                         </Badge>
                       )}

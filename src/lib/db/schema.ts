@@ -152,3 +152,21 @@ export const carDocuments = pgTable('car_documents', {
   carIdx: index('car_docs_car_idx').on(table.carId),
   statusIdx: index('car_docs_status_idx').on(table.status),
 }));
+
+export const inviteCodes = pgTable('invite_codes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  code: text('code').unique().notNull(),
+  email: text('email'), // optional - for targeted invites
+  role: text('role').notNull(), // buyer, seller, admin
+  createdBy: uuid('created_by').references(() => users.id).notNull(),
+  usedBy: uuid('used_by').references(() => users.id),
+  expiresAt: timestamp('expires_at').notNull(),
+  usedAt: timestamp('used_at'),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  codeIdx: index('invite_codes_code_idx').on(table.code),
+  createdByIdx: index('invite_codes_created_by_idx').on(table.createdBy),
+  usedByIdx: index('invite_codes_used_by_idx').on(table.usedBy),
+  activeIdx: index('invite_codes_active_idx').on(table.isActive),
+}));

@@ -1,324 +1,551 @@
-# Rides - Car Rental Platform for Nigeria 🚗
+# Naija Rides - Car Rental Platform
 
-A comprehensive car rental platform built for the Nigerian market, featuring Google Maps integration, PWA capabilities, Paystack integration, and automated deployment on Google Cloud Platform.
+> **Enterprise-grade car rental platform for the Nigerian market**
+
+[![Production Build](https://img.shields.io/badge/build-passing-green.svg)](#deployment)
+[![Security](https://img.shields.io/badge/security-enterprise--grade-blue.svg)](#security)
+[![Deployment](https://img.shields.io/badge/deployment-google--cloud-blue.svg)](#deployment)
+
+A comprehensive, production-ready car rental platform specifically designed for the Nigerian market. Built with Next.js 15, TypeScript, and modern cloud infrastructure, it connects car owners with renters across major Nigerian cities with enterprise-level security, scalability, and reliability.
 
 ## 🚀 Quick Start
 
-Get up and running in minutes with our automated setup:
+### Prerequisites
 
-```bash
-# Clone and setup everything automatically
-git clone https://github.com/straitstreet/rides.git
-cd rides
-./setup.sh
+- Node.js 18+ and Yarn
+- PostgreSQL database
+- Google Cloud Platform account
+- Required API keys (see Environment Variables)
+
+### Local Development
+
+1. **Clone and Setup**
+   ```bash
+   git clone <repository-url>
+   cd naija-rides
+   yarn install
+   ```
+
+2. **Environment Configuration**
+   ```bash
+   cp .env.local.example .env.local
+   # Edit .env.local with your configuration
+   ```
+
+3. **Database Setup**
+   ```bash
+   # Start PostgreSQL (Docker)
+   yarn db:setup
+
+   # Generate and push schema
+   yarn db:generate
+   yarn db:push
+   ```
+
+4. **Start Development Server**
+   ```bash
+   yarn dev
+   ```
+
+   Visit `http://localhost:3000`
+
+## 🗄️ Environment Variables
+
+### Required Variables
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/naija_rides"
+
+# Authentication (Clerk)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
+CLERK_SECRET_KEY="sk_test_..."
+
+# Payments (Paystack)
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY="pk_test_..."
+PAYSTACK_SECRET_KEY="sk_test_..."
+
+# Google Cloud
+GOOGLE_CLOUD_PROJECT_ID="your-project-id"
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your-maps-api-key"
+
+# App Configuration
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
-**That's it!** The script will:
-- Install dependencies
-- Set up Google Maps API automatically
-- Configure environment files
-- Build and start the development server
+### Production Variables
 
-For manual setup or advanced configuration, see the [Manual Setup](#manual-setup) section below.
+For production deployment, use:
+- Live Clerk keys (`pk_live_...`, `sk_live_...`)
+- Live Paystack keys (`pk_live_...`, `sk_live_...`)
+- Production database URL
+- Production domain for `NEXT_PUBLIC_APP_URL`
 
-## 🌟 Overview
+## 🚗 Platform Overview
 
-Rides is a modern car rental platform that connects car owners with renters across Nigeria. The platform provides a seamless experience for both car owners looking to monetize their vehicles and travelers needing reliable transportation.
-
-🌐 **Live Demo**: [https://naija-rides-app-53hiswdaka-uc.a.run.app](https://naija-rides-app-53hiswdaka-uc.a.run.app)
+Naija Rides is a modern car rental platform that connects car owners with renters across Nigeria. The platform provides a seamless experience for both car owners looking to monetize their vehicles and travelers needing reliable transportation.
 
 ### Key Features
-- **🗺️ Google Maps Integration**: Location autocomplete and interactive maps
-- **📱 Progressive Web App**: Offline capability and mobile-first design
-- **💳 Paystack Integration**: Secure payments optimized for Nigeria
-- **🔐 Clerk Authentication**: Secure user authentication with role management
-- **📸 Image Management**: Cloud storage with automatic optimization
-- **⭐ Review System**: Dual reviews between renters and car owners
-- **🚀 Auto Deployment**: One-click deployment to Google Cloud Platform
 
-## 🛠️ Technology Stack
+- **Invite-First Access**: Closed platform with one-time access codes for quality control
+- **Enterprise Security**: Role-based authentication, comprehensive CSP headers, input validation
+- **Mobile-First Design**: PWA-ready, responsive design optimized for Nigerian mobile usage
+- **Local Payment Integration**: Paystack integration supporting cards, bank transfers, and USSD
+- **Maps Integration**: Google Maps for location services and car tracking
+- **Admin Dashboard**: Comprehensive admin portal for user, car, and booking management
+- **Real-time Features**: Live booking status, notifications, and analytics
+- **Cloud-Ready**: Google Cloud Platform deployment with auto-scaling
+- **Review System**: Dual reviews between renters and car owners
+- **Monitoring**: Google Cloud Logging integration with structured metrics
 
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, ShadCN UI
-- **Backend**: Next.js API routes, PostgreSQL, Drizzle ORM
-- **Maps**: Google Maps JavaScript API, Places API, Geocoding API
-- **Authentication**: Clerk with role-based access control
-- **Payments**: Paystack (cards, bank transfers, USSD)
-- **Storage**: Google Cloud Storage with CDN
-- **Deployment**: Google Cloud Platform (Cloud Run, Cloud SQL, Cloud Build)
+## 🏗️ Technology Stack
 
-## 🏗️ Project Structure
+### Core Framework
+- **Frontend**: Next.js 15.5.4 with App Router, React 19, TypeScript 5
+- **Styling**: Tailwind CSS 4 with ShadCN UI components
+- **Database**: PostgreSQL with Drizzle ORM 0.36.4
+- **Authentication**: Clerk 6.32.2 with role-based access control
+- **Payments**: Paystack (Nigerian payment gateway)
+- **Maps**: Google Maps API with Places autocomplete
+- **State Management**: TanStack React Query 5.90.2
+- **Cloud**: Google Cloud Platform (Cloud Run, Cloud Build, Secret Manager)
+- **Monitoring**: Structured logging with Google Cloud Logging integration
+
+### System Architecture
+
+```mermaid
+graph TB
+    LB[Load Balancer<br/>Google Cloud Load Balancer] --> CR[Cloud Run<br/>Auto-scaling Containers]
+    CR --> DB[(PostgreSQL<br/>Cloud SQL)]
+    CR --> SM[Secret Manager<br/>Environment Variables]
+    CR --> CS[Cloud Storage<br/>File Uploads]
+
+    subgraph "External APIs"
+        CLERK[Clerk Authentication]
+        PAYSTACK[Paystack Payments]
+        GMAPS[Google Maps API]
+    end
+
+    CR --> CLERK
+    CR --> PAYSTACK
+    CR --> GMAPS
+
+    subgraph "Monitoring"
+        LOGS[Cloud Logging]
+        METRICS[Cloud Monitoring]
+        TRACES[Cloud Trace]
+    end
+
+    CR --> LOGS
+    CR --> METRICS
+    CR --> TRACES
+```
+
+## 👥 User Roles & Access Control
+
+### 1. Admin (`admin`)
+- **Access**: Full platform administration at `/admin/*`
+- **Capabilities**:
+  - User management and verification
+  - Invite code generation and management
+  - Car listing approval/rejection
+  - Booking oversight and dispute resolution
+  - Platform analytics and reporting
+  - System configuration and settings
+
+### 2. Seller/Car Owner (`seller`)
+- **Access**: Car owner dashboard at `/dashboard`
+- **Capabilities**:
+  - Add and manage car listings
+  - Upload multiple images (up to 10 per car)
+  - View and manage bookings
+  - Track earnings and analytics
+  - Respond to rental requests
+
+### 3. Buyer/Renter (`buyer`)
+- **Access**: Renter dashboard at `/dashboard`
+- **Capabilities**:
+  - Search and book cars
+  - Manage trip history
+  - Favorite cars and owners
+  - Submit reviews and ratings
+
+## 🎟️ Invite-First System
+
+### Overview
+The platform operates as a closed system requiring one-time access codes for registration to maintain quality and control growth.
+
+### Admin Invite Management
+- Generate unique one-time access codes
+- Set expiration dates for codes
+- Track code usage and analytics
+- Manage invitation campaigns
+- Monitor platform growth
+
+### User Registration Flow
+1. User receives invite code from admin
+2. Visits registration page with code
+3. Code validated against database
+4. Successful validation allows account creation
+5. Code is marked as used and cannot be reused
+
+## 🛡️ Admin Dashboard
+
+The admin dashboard provides comprehensive platform management:
+
+### User Management (`/admin/users`)
+- View all platform users
+- Verify user accounts and documents
+- Suspend/activate accounts
+- User analytics and insights
+
+### Invite Management (`/admin/invites`)
+- Generate one-time access codes
+- Set code expiration dates
+- Track code usage statistics
+- Manage invitation campaigns
+- View registration analytics
+
+### Car Management (`/admin/cars`)
+- Review and approve car listings
+- Verify vehicle documents
+- Monitor car performance
+- Handle car-related disputes
+
+### Booking Management (`/admin/bookings`)
+- Oversee all platform bookings
+- Monitor booking trends
+- Resolve booking disputes
+- Revenue tracking
+
+### Analytics (`/admin/analytics`)
+- Platform KPIs and metrics
+- Revenue and growth trends
+- User behavior analytics
+- Top performing cities and cars
+
+### Reports & Issues (`/admin/reports`)
+- User-reported issues
+- Safety and security reports
+- Dispute resolution
+- Platform moderation
+
+### System Settings (`/admin/settings`)
+- Platform configuration
+- Payment settings
+- Security policies
+- API management
+
+## 🗄️ Database Schema (Drizzle ORM)
+
+### Core Tables
+
+#### `users`
+```typescript
+{
+  id: uuid (PK),
+  email: text (unique),
+  firstName: text,
+  lastName: text,
+  phone: text (unique),
+  dateOfBirth: timestamp,
+  driversLicenseNumber: text,
+  driversLicenseExpiry: timestamp,
+  profileImage: text,
+  isVerified: boolean (default: false),
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+#### `inviteCodes`
+```typescript
+{
+  id: uuid (PK),
+  code: text (unique),
+  email: text (optional - for targeted invites),
+  role: text (buyer, seller, admin),
+  createdBy: uuid (FK -> users.id),
+  usedBy: uuid (FK -> users.id, nullable),
+  expiresAt: timestamp,
+  usedAt: timestamp (nullable),
+  isActive: boolean (default: true),
+  createdAt: timestamp
+}
+```
+
+#### `cars`
+```typescript
+{
+  id: uuid (PK),
+  ownerId: uuid (FK -> users.id),
+  make: text,
+  model: text,
+  year: integer,
+  color: text,
+  plateNumber: text (unique),
+  vin: text (unique),
+  fuelType: text, // petrol, diesel, hybrid, electric
+  transmission: text, // manual, automatic
+  seats: integer,
+  category: text, // economy, compact, mid-size, full-size, luxury, suv
+  dailyRate: decimal(10,2),
+  description: text,
+  features: text, // JSON string of features array
+  location: text, // city/area in Nigeria
+  latitude: decimal(10,8),
+  longitude: decimal(11,8),
+  isAvailable: boolean (default: true),
+  isVerified: boolean (default: false),
+  // Indexes on: ownerId, location, isAvailable
+}
+```
+
+#### `carImages`
+```typescript
+{
+  id: uuid (PK),
+  carId: uuid (FK -> cars.id, cascade delete),
+  imageUrl: text,
+  isPrimary: boolean (default: false),
+  createdAt: timestamp
+}
+```
+
+#### `bookings`
+```typescript
+{
+  id: uuid (PK),
+  carId: uuid (FK -> cars.id),
+  renterId: uuid (FK -> users.id),
+  startDate: timestamp,
+  endDate: timestamp,
+  totalAmount: decimal(10,2),
+  status: text, // pending, confirmed, active, completed, cancelled
+  pickupLocation: text,
+  dropoffLocation: text,
+  specialRequests: text,
+  // Indexes on: carId, renterId, status
+}
+```
+
+#### `payments`
+```typescript
+{
+  id: uuid (PK),
+  bookingId: uuid (FK -> bookings.id),
+  paystackReference: text (unique),
+  amount: decimal(10,2),
+  status: text, // pending, success, failed
+  paymentMethod: text, // card, bank_transfer, ussd
+  paidAt: timestamp,
+  // Indexes on: bookingId, paystackReference
+}
+```
+
+#### `reviews`
+```typescript
+{
+  id: uuid (PK),
+  bookingId: uuid (FK -> bookings.id),
+  reviewerId: uuid (FK -> users.id),
+  reviewedId: uuid (FK -> users.id), // car owner or renter
+  rating: integer, // 1-5 stars
+  comment: text,
+  reviewType: text, // renter_review, owner_review
+  // Indexes on: bookingId, reviewedId
+}
+```
+
+## 🔐 Security Features
+
+### Authentication & Authorization
+- **Clerk Integration**: Enterprise-grade authentication
+- **Role-Based Access Control**: Admin, seller, buyer roles
+- **Route Protection**: Middleware-based route security
+- **Session Management**: Secure session handling
+- **Invite Code Validation**: One-time access code verification
+
+### API Security
+- **Rate Limiting**: Per-endpoint rate limiting (10-100 requests/minute)
+- **Input Validation**: Comprehensive Zod schema validation
+- **SQL Injection Prevention**: Drizzle ORM parameterized queries
+- **CORS Protection**: Configured CORS policies
+- **Authentication Middleware**: JWT token validation
+
+### Headers & Policies
+- **Content Security Policy**: Comprehensive CSP headers
+- **Security Headers**: XSS protection, frame options, HSTS
+- **HTTPS Enforcement**: SSL/TLS in production
+
+### Data Protection
+- **Secret Management**: Google Cloud Secret Manager
+- **Environment Isolation**: Separate dev/staging/prod
+- **PCI Compliance**: Paystack payment processing
+- **File Upload Security**: Type, size, and count validation
+
+## 🏃‍♂️ Development Commands
+
+```bash
+yarn dev          # Start development server
+yarn build        # Build for production
+yarn start        # Start production server
+yarn lint         # Run ESLint
+yarn db:generate  # Generate database migrations
+yarn db:push      # Push schema to database
+yarn db:migrate   # Apply database migrations
+yarn db:studio    # Open database studio
+yarn db:setup     # Start PostgreSQL (Docker) and push schema
+yarn db:up        # Start database container
+yarn db:down      # Stop database container
+yarn db:seed      # Seed admin user
+yarn test:api     # Test API endpoints
+```
+
+## 📂 Project Structure
 
 ```
 /naija-rides/
 ├── src/
-│   ├── app/                    # Next.js 15 App Router
-│   │   ├── (legal)/           # Legal pages (grouped route)
-│   │   ├── admin/             # Admin dashboard
-│   │   ├── cars/              # Car browsing
-│   │   ├── dashboard/         # User dashboards
-│   │   └── ...               # Other pages
+│   ├── app/                          # Next.js 15 App Router
+│   │   ├── (legal)/                  # Legal pages (grouped route)
+│   │   │   ├── cookies/
+│   │   │   ├── privacy/
+│   │   │   └── terms/
+│   │   ├── admin/                    # Admin dashboard
+│   │   │   ├── analytics/
+│   │   │   ├── bookings/
+│   │   │   ├── cars/
+│   │   │   ├── invites/              # Invite management
+│   │   │   ├── reports/
+│   │   │   ├── settings/
+│   │   │   └── users/
+│   │   ├── cars/                     # Car browsing page
+│   │   ├── dashboard/                # User dashboards
+│   │   ├── about/                    # About page
+│   │   ├── contact/                  # Contact page
+│   │   ├── help/                     # Help center
+│   │   ├── list-car/                 # List car for rent
+│   │   ├── register/                 # User registration
+│   │   ├── safety/                   # Safety information
+│   │   ├── api/                      # API routes
+│   │   │   ├── cars/[id]/images/     # Image upload API
+│   │   │   ├── invites/              # Invite management API
+│   │   │   │   ├── validate/         # Validate invite codes
+│   │   │   │   └── use/              # Use invite codes
+│   │   │   ├── bookings/             # Booking management
+│   │   │   ├── health/               # Health check endpoint
+│   │   │   ├── payments/paystack/webhook/ # Payment webhooks
+│   │   │   ├── reviews/              # Review system API
+│   │   │   └── users/me/             # User profile API
+│   │   ├── layout.tsx                # Root layout with Clerk provider
+│   │   ├── page.tsx                  # Homepage with car listings
+│   │   └── globals.css               # Tailwind CSS with custom variables
 │   ├── components/
-│   │   ├── maps/              # Google Maps components
-│   │   ├── reviews/           # Review system
-│   │   ├── ui/                # ShadCN UI components
-│   │   └── ...               # Other components
-│   └── lib/
-│       ├── db/                # Database schema & connection
-│       ├── auth.ts            # Authentication utilities
-│       └── ...               # Other utilities
-├── scripts/
-│   └── setup-google-maps.sh   # Automated Google Maps setup
-├── terraform/                 # Infrastructure as Code
-├── deploy/                    # Deployment configurations
-├── setup.sh                  # Main setup script
-└── README.md                 # This file
+│   │   ├── admin/                    # Admin-specific components
+│   │   │   ├── admin-header.tsx
+│   │   │   └── admin-sidebar.tsx
+│   │   ├── dashboard/                # Dashboard components
+│   │   │   ├── buyer-dashboard.tsx
+│   │   │   ├── seller-dashboard.tsx
+│   │   │   ├── dashboard-header.tsx
+│   │   │   └── dashboard-sidebar.tsx
+│   │   ├── maps/                     # Google Maps components
+│   │   ├── reviews/                  # Review system components
+│   │   │   ├── review-card.tsx
+│   │   │   ├── review-form.tsx
+│   │   │   └── review-summary.tsx
+│   │   ├── ui/                       # ShadCN UI components
+│   │   │   ├── alert.tsx
+│   │   │   ├── avatar.tsx
+│   │   │   ├── badge.tsx
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── dropdown-menu.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── multiple-image-upload.tsx
+│   │   │   ├── progress.tsx
+│   │   │   ├── select.tsx
+│   │   │   ├── separator.tsx
+│   │   │   ├── switch.tsx
+│   │   │   ├── textarea.tsx
+│   │   │   └── [other ui components]
+│   │   ├── booking-modal.tsx         # Car booking modal
+│   │   └── error-boundary.tsx        # Error handling component
+│   ├── lib/
+│   │   ├── db/
+│   │   │   ├── schema.ts             # Drizzle ORM schema
+│   │   │   └── index.ts              # Database connection
+│   │   ├── api/
+│   │   │   ├── middleware.ts         # API middleware
+│   │   │   └── validation.ts         # Zod schemas
+│   │   ├── auth.ts                   # Client-side auth utilities
+│   │   ├── auth-server.ts            # Server-side auth utilities
+│   │   ├── monitoring.ts             # Logging and metrics
+│   │   ├── react-query.tsx           # React Query configuration
+│   │   ├── seed-data.ts              # Sample data & helper functions
+│   │   └── utils.ts                  # Utility functions (cn helper)
+│   ├── hooks/
+│   │   ├── api/                      # API hooks
+│   │   └── use-car-images.ts         # Image management hook
+│   └── scripts/
+│       └── seed-admin.ts             # Admin seeding script
+├── deploy/                           # Deployment configurations
+├── drizzle/                          # Database migrations
+├── docker-compose.yml                # Local development setup
+├── Dockerfile                        # Production container
+├── README.md                         # This file
+├── package.json                      # Dependencies and scripts
+├── components.json                   # ShadCN UI configuration
+├── drizzle.config.ts                 # Database configuration
+├── next.config.js                    # Next.js configuration
+└── tsconfig.json                     # TypeScript configuration
 ```
 
-## 🚀 Automated Setup
+## 📱 Features
 
-### Option 1: Complete Automated Setup (Recommended)
+### Multiple Image Upload System
+- **Max Images**: 10 per car listing
+- **File Size Limit**: 5MB per image
+- **Supported Formats**: JPEG, PNG, WebP
+- **Features**:
+  - Drag & drop upload interface
+  - Image preview and management
+  - Primary image selection
+  - Real-time validation
+  - Progress tracking
+  - Error handling
 
-```bash
-# Setup with gcloud CLI (default)
-./setup.sh --project-id your-project-id
-
-# Or setup with Terraform
-./setup.sh --project-id your-project-id --terraform
-```
-
-### Option 2: Google Maps API Only
-
-```bash
-# Automated Google Maps API setup
-./scripts/setup-google-maps.sh
-```
-
-### Option 3: Infrastructure as Code with Terraform
-
-```bash
-cd terraform
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your settings
-terraform init
-terraform apply
-```
-
-The automated setup will:
-- ✅ Check and install prerequisites (Node.js, Yarn, gcloud CLI)
-- ✅ Enable required Google APIs programmatically
-- ✅ Create API keys with proper restrictions
-- ✅ Configure environment variables
-- ✅ Install dependencies and build the project
-- ✅ Start the development server
-
-## 📍 Google Maps Integration
-
-### Automated API Setup
-
-The platform includes automated Google Maps API setup that:
-
-1. **Enables Required APIs**:
-   - Maps JavaScript API (for displaying maps)
-   - Places API (for location autocomplete)
-   - Geocoding API (for address conversion)
-
-2. **Creates Secure API Keys**:
-   - Automatic key generation with restrictions
-   - Domain-based access control
-   - API-specific permissions
-
-3. **Configures Components**:
-   - Location autocomplete with Nigerian city bias
-   - Interactive car location maps
-   - Pickup/dropoff location selection
-
-### Manual Google Maps Setup
-
-If you prefer manual setup:
-
-1. **Create Google Cloud Project**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create new project or select existing one
-   - Enable billing for your project
-
-2. **Enable APIs**
-   - Go to "APIs & Services" > "Library"
-   - Enable: Maps JavaScript API, Places API, Geocoding API
-
-3. **Create API Key**
-   - Go to "APIs & Services" > "Credentials"
-   - Click "Create Credentials" > "API Key"
-   - Restrict key to specific APIs and domains
-
-4. **Add to Environment**
-   ```bash
-   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your_api_key_here"
-   ```
-
-### Google Maps Components
-
-```typescript
-// Available map components
-import {
-  GoogleMap,           // Core map component
-  LocationAutocomplete, // Location search with autocomplete
-  CarLocationMap       // Car-specific location display
-} from '@/components/maps';
-
-// Usage example
-<LocationAutocomplete
-  placeholder="Enter pickup location"
-  bias="nigeria"
-  onChange={(value, place) => {
-    console.log('Selected:', place);
-  }}
-/>
-```
-
-### Nigerian Cities Support
-
-Pre-configured coordinates for major Nigerian cities:
-- Lagos, Abuja, Port Harcourt, Kano, Ibadan
-- Benin City, Jos, Ilorin, Owerri, Calabar
-- Enugu, Kaduna, Zaria, Warri, Akure
-
-## 🗄️ Data Architecture
-
-### Core Models
-
-**Users**
-- Profile: Name, email, phone, date of birth
-- Verification: Driver's license, verification status
-- Authentication: Clerk-based secure authentication
-
-**Cars**
-- Details: Make, model, year, color, specifications
-- Pricing: Daily rates with decimal precision
-- Location: City/area with GPS coordinates
-- Availability: Real-time status and verification
-
-**Bookings**
-- Rental period with precise timing
-- Status tracking (pending → confirmed → active → completed)
-- Location management (pickup/dropoff)
-- Payment integration with Paystack
-
-**Reviews**
-- Dual review system (renters ↔ car owners)
-- 5-star ratings with detailed comments
-- Trust and reputation building
-
-### Database Schema (Drizzle ORM)
-
-```typescript
-// Example schema structure
-users: {
-  id: uuid,
-  email: text (unique),
-  firstName: text,
-  lastName: text,
-  phone: text,
-  isVerified: boolean
-}
-
-cars: {
-  id: uuid,
-  ownerId: uuid (FK),
-  make: text,
-  model: text,
-  dailyRate: decimal(10,2),
-  location: text,
-  latitude: decimal(10,8),
-  longitude: decimal(11,8),
-  isAvailable: boolean
-}
-
-bookings: {
-  id: uuid,
-  carId: uuid (FK),
-  renterId: uuid (FK),
-  startDate: timestamp,
-  endDate: timestamp,
-  totalAmount: decimal(10,2),
-  status: text
-}
-```
-
-## 💳 Payment Integration (Paystack)
-
+### Payment Integration (Paystack)
 Integrated payment solution optimized for the Nigerian market:
 
-### Supported Payment Methods
+#### Supported Payment Methods
 - **Cards**: Visa, Mastercard, Verve
 - **Bank Transfer**: Direct bank transfers
 - **USSD**: Mobile banking via USSD codes
 - **Bank Branches**: Physical payment locations
 
-### Payment Flow
+#### Payment Flow
 1. User selects car and rental dates
 2. Total calculated (daily rate × days)
 3. Secure payment via Paystack
 4. Webhook verification and booking confirmation
 
-### Configuration
-```env
-NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY="pk_test_..."
-PAYSTACK_SECRET_KEY="sk_test_..."
-```
+### Google Maps Integration
+- **Location Autocomplete**: Nigerian city bias
+- **Interactive Maps**: Car location display
+- **Pickup/Dropoff Selection**: Location selection interface
+- **API Setup**: Automated Google Maps API configuration
 
-## 🔐 Authentication & Authorization
+### Review System
+- **Dual Reviews**: Renters ↔ car owners
+- **5-Star Ratings**: Detailed rating system
+- **Comment System**: Detailed feedback
+- **Trust Building**: Reputation system
 
-### Role-Based Access Control
-- **Admin**: Platform management and oversight
-- **Seller**: Car owners managing their vehicles
-- **Buyer**: Renters browsing and booking cars
-
-### Authentication Setup (Clerk)
-```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
-CLERK_SECRET_KEY="sk_test_..."
-```
-
-### Security Features
-- User verification (driver's license, phone, email)
-- Car verification (documents, photos, manual review)
-- Secure file upload and storage
-- CSRF and XSS protection
-
-## 🎨 UI/UX Design System
-
-### Design Principles
-- **Nigerian-focused**: Naira currency, local cities, cultural context
-- **Mobile-first**: Optimized for Nigerian mobile usage patterns
-- **Clean & Professional**: Minimal design with clear hierarchy
-- **Accessible**: ARIA labels, keyboard navigation, screen reader support
-
-### Typography & Colors
-- **Fonts**: Inter (text), Space Grotesk (headings/branding)
-- **Colors**: Teal primary (`oklch(0.45 0.15 165)`), carefully crafted palette
-- **Components**: ShadCN UI with custom variants
-
-## 📱 Progressive Web App
-
-### PWA Features
-- **Offline Capability**: Browse cars without internet
-- **Push Notifications**: Booking updates and reminders
-- **Home Screen Install**: App-like mobile experience
-- **Fast Loading**: Optimized for Nigerian network conditions
-
-### PWA Configuration
-```json
-// manifest.json
-{
-  "name": "Rides - Car Rental Nigeria",
-  "short_name": "Rides",
-  "theme_color": "#0f766e",
-  "background_color": "#ffffff",
-  "display": "standalone"
-}
-```
-
-## 🚀 Deployment
+## 🚀 Production Deployment
 
 ### Automated Deployment
 
@@ -329,28 +556,11 @@ Deploy to Google Cloud Platform with one command:
 PROJECT_ID=your-project ./deploy.sh
 ```
 
-**✅ Successfully Deployed**: This application is currently running in production at:
+**Successfully Deployed**: This application is currently running in production at:
 - **Production URL**: [https://naija-rides-app-53hiswdaka-uc.a.run.app](https://naija-rides-app-53hiswdaka-uc.a.run.app)
 - **Platform**: Google Cloud Run (Serverless)
 - **Region**: us-central1
-- **Status**: ✅ Active and ready for production use
-
-### Manual Deployment
-
-1. **Build the application**
-   ```bash
-   yarn build
-   ```
-
-2. **Deploy to Cloud Run**
-   ```bash
-   gcloud builds submit --project=$PROJECT_ID
-   ```
-
-3. **Configure environment variables**
-   - Set all required environment variables in Cloud Run
-   - Configure Cloud SQL connection
-   - Set up Cloud Storage bucket
+- **Status**: Active and ready for production use
 
 ### Infrastructure Components
 - **Cloud Run**: Serverless container deployment
@@ -358,8 +568,9 @@ PROJECT_ID=your-project ./deploy.sh
 - **Cloud Storage**: File storage with CDN
 - **Cloud Build**: Automated CI/CD pipeline
 - **Cloud CDN**: Global content delivery
+- **Secret Manager**: Secure environment variables
 
-### Environment Variables (Production)
+### Production Environment Variables
 ```env
 # Required for production
 DATABASE_URL="postgresql://..."
@@ -373,81 +584,7 @@ GOOGLE_CLOUD_STORAGE_BUCKET=""
 NEXT_PUBLIC_APP_URL="https://your-domain.com"
 ```
 
-## 🛠️ Manual Setup
-
-If you prefer manual setup or need to customize the installation:
-
-### Prerequisites
-- Node.js 18+
-- Yarn package manager
-- PostgreSQL database
-- Google Cloud Platform account
-- Paystack account (for payments)
-- Clerk account (for authentication)
-
-### Installation Steps
-
-1. **Clone and install dependencies**
-   ```bash
-   git clone https://github.com/straitstreet/rides.git
-   cd rides
-   yarn install
-   ```
-
-2. **Setup environment variables**
-   ```bash
-   cp .env.local.example .env.local
-   # Edit .env.local with your API keys
-   ```
-
-3. **Setup database**
-   ```bash
-   yarn db:generate
-   yarn db:push
-   ```
-
-4. **Setup Google Maps (choose one)**
-   ```bash
-   # Option A: Automated setup
-   ./scripts/setup-google-maps.sh
-
-   # Option B: Terraform
-   cd terraform && terraform apply
-   ```
-
-5. **Build and start**
-   ```bash
-   yarn build
-   yarn dev
-   ```
-
-### Development Commands
-```bash
-yarn dev          # Start development server
-yarn build        # Build for production
-yarn start        # Start production server
-yarn lint         # Run ESLint
-yarn db:generate  # Generate database migrations
-yarn db:push      # Push schema to database
-yarn db:studio    # Open database studio
-```
-
-## 🧪 Testing
-
-### Running Tests
-```bash
-yarn test         # Run all tests
-yarn test:watch   # Run tests in watch mode
-yarn test:e2e     # Run end-to-end tests
-```
-
-### Testing Strategy
-- **Unit Tests**: Component and utility function testing
-- **Integration Tests**: API route and database testing
-- **E2E Tests**: Full user journey testing with Playwright
-- **Visual Tests**: UI component visual regression testing
-
-## 🔍 Monitoring & Analytics
+## 📊 Monitoring & Analytics
 
 ### Application Monitoring
 - **Error Tracking**: Integrated error reporting
@@ -461,6 +598,78 @@ yarn test:e2e     # Run end-to-end tests
 - **Cloud Trace**: Request tracing and performance analysis
 - **Uptime Monitoring**: Service availability checks
 
+### Health Checks
+- **Application Health**: `/api/health` endpoint
+- **Database Connectivity**: Automated health checks
+- **External Service Status**: API dependency monitoring
+
+## 🧪 Testing
+
+### Running Tests
+```bash
+yarn test:api     # Run API endpoint tests
+```
+
+### Testing Strategy
+- **API Tests**: Comprehensive API endpoint testing (Node.js test suite)
+- **Integration Tests**: API route and database testing
+- **Manual Testing**: UI and user journey testing
+- **Production Monitoring**: Health checks and error tracking
+
+## 🔧 Development Guidelines
+
+### Code Standards
+- **TypeScript**: Strict mode enabled, full type coverage
+- **ESLint**: Enforced code style and best practices
+- **Prettier**: Consistent code formatting
+- **Conventional Commits**: Standardized commit messages
+
+### When Adding New Features
+1. **Update Database Schema**: Add new tables/columns in `src/lib/db/schema.ts`
+2. **Create Seed Data**: Add sample data in `src/lib/seed-data.ts`
+3. **Build Components**: Use ShadCN UI components as base
+4. **Add Types**: Define TypeScript interfaces
+5. **Test Roles**: Ensure proper role-based access
+6. **Mobile Responsive**: Test on mobile breakpoints
+
+## 🔍 Known Issues & Troubleshooting
+
+### Database Connection Issues
+If you encounter PostgreSQL connection issues:
+
+```bash
+# Reset database
+yarn db:down && yarn db:up
+yarn db:push --force
+```
+
+### Build Failures
+```bash
+# Clear cache and reinstall
+rm -rf node_modules .next
+yarn install
+yarn build
+```
+
+### Google Cloud Deployment Issues
+- Check project permissions
+- Verify billing is enabled
+- Ensure all APIs are enabled
+
+## 🎯 Future Enhancements
+
+### Short Term
+- **Redis Integration**: Session and rate limit storage
+- **Image Processing**: Resize, compression, optimization
+- **Push Notifications**: Real-time updates
+- **Advanced Search**: Filters and sorting
+
+### Long Term
+- **Machine Learning**: Pricing optimization
+- **Mobile App**: React Native implementation
+- **Multi-language**: Support for local languages
+- **IoT Integration**: Car tracking and monitoring
+
 ## 🤝 Contributing
 
 ### Development Workflow
@@ -472,17 +681,16 @@ yarn test:e2e     # Run end-to-end tests
 6. Push to your branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
-### Code Standards
-- **TypeScript**: Strict mode enabled, full type coverage
-- **ESLint**: Enforced code style and best practices
-- **Prettier**: Consistent code formatting
-- **Conventional Commits**: Standardized commit messages
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 📞 Support
+
+### Getting Help
+- **Email**: support@rides.ng
+- **Issues**: [GitHub Issues](https://github.com/straitstreet/rides/issues)
+- **Documentation**: This README covers everything!
 
 ### Common Issues
 
@@ -501,34 +709,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Check user roles and permissions
 - Verify middleware configuration
 
-### Getting Help
-- 📧 Email: support@rides.ng
-- 🐛 Issues: [GitHub Issues](https://github.com/straitstreet/rides/issues)
-- 📖 Documentation: This README covers everything!
-
-### Troubleshooting
-
-**Build failures?**
-```bash
-# Clear cache and reinstall
-rm -rf node_modules .next
-yarn install
-yarn build
-```
-
-**Database connection issues?**
-```bash
-# Reset database
-yarn db:push --force
-```
-
-**Google Cloud deployment issues?**
-- Check project permissions
-- Verify billing is enabled
-- Ensure all APIs are enabled
-
 ---
 
-**🚀 Ready to get started?** Run `./setup.sh` and you'll be up and running in minutes!
+**Ready to get started?** Run `yarn dev` and you'll be up and running in minutes!
 
-Built with ❤️ for the Nigerian market by the Rides team.
+Built for the Nigerian market with ❤️ by the Naija Rides team.

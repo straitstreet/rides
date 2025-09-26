@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db';
+import { getDatabase } from '@/lib/db';
 import { payments, bookings } from '@/lib/db/schema';
 import crypto from 'crypto';
 
@@ -60,10 +60,10 @@ export async function POST(req: NextRequest) {
 async function handleSuccessfulPayment(data: { reference: string; amount: number }) {
   try {
     const reference = data.reference;
-    const amount = data.amount / 100; // Paystack amounts are in kobo
+    // const amount = data.amount / 100; // Paystack amounts are in kobo - for future use
 
     // Find the payment record
-    const [payment] = await db
+    const [payment] = await getDatabase()
       .select()
       .from(payments)
       .where(eq(payments.paystackReference, reference))
@@ -75,7 +75,7 @@ async function handleSuccessfulPayment(data: { reference: string; amount: number
     }
 
     // Update payment status
-    await db
+    await getDatabase()
       .update(payments)
       .set({
         status: 'success',
@@ -84,7 +84,7 @@ async function handleSuccessfulPayment(data: { reference: string; amount: number
       .where(eq(payments.id, payment.id));
 
     // Update booking status to confirmed
-    await db
+    await getDatabase()
       .update(bookings)
       .set({
         status: 'confirmed',
@@ -103,7 +103,7 @@ async function handleFailedPayment(data: { reference: string }) {
     const reference = data.reference;
 
     // Find the payment record
-    const [payment] = await db
+    const [payment] = await getDatabase()
       .select()
       .from(payments)
       .where(eq(payments.paystackReference, reference))
@@ -115,7 +115,7 @@ async function handleFailedPayment(data: { reference: string }) {
     }
 
     // Update payment status
-    await db
+    await getDatabase()
       .update(payments)
       .set({
         status: 'failed',
