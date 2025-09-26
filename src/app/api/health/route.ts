@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+
+// GET /api/health - Health check endpoint
+export async function GET(req: NextRequest) {
+  try {
+    // Check database connectivity
+    await db.select().from(users).limit(1);
+
+    return NextResponse.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      checks: {
+        database: 'healthy',
+        api: 'healthy',
+      }
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+
+    return NextResponse.json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      checks: {
+        database: 'unhealthy',
+        api: 'healthy',
+      },
+      error: 'Database connection failed'
+    }, { status: 503 });
+  }
+}

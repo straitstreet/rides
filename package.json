@@ -7,10 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "db:up": "docker-compose up -d postgres",
+    "db:down": "docker-compose down",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:setup": "yarn db:up && sleep 5 && yarn db:push",
+    "test:api": "node tests/api-test.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.32.2",
