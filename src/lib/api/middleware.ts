@@ -6,7 +6,7 @@ export interface ApiError {
   message: string;
   code: string;
   status: number;
-  details?: any;
+  details?: unknown;
 }
 
 export class ApiException extends Error {
@@ -25,9 +25,9 @@ export function createApiHandler(options?: {
   rateLimit?: { max: number; windowMs: number };
 }) {
   return function apiHandler(
-    handler: (req: NextRequest, context?: any) => Promise<NextResponse>
+    handler: (req: NextRequest, context?: unknown) => Promise<NextResponse>
   ) {
-    return async (req: NextRequest, context?: any): Promise<NextResponse> => {
+    return async (req: NextRequest, context?: unknown): Promise<NextResponse> => {
       try {
         // Rate limiting
         if (options?.rateLimit) {
@@ -133,6 +133,6 @@ export function validateQuery<T>(schema: ZodSchema<T>, searchParams: URLSearchPa
 }
 
 // Helper to throw API errors
-export function throwApiError(message: string, code: string, status: number, details?: any): never {
+export function throwApiError(message: string, code: string, status: number, details?: unknown): never {
   throw new ApiException({ message, code, status, details });
 }

@@ -14,7 +14,7 @@ export const GET = createApiHandler({
   const query = validateQuery(reviewQuerySchema, searchParams);
 
   try {
-    let whereConditions = [];
+    const whereConditions = [];
 
     if (query.reviewedId) {
       whereConditions.push(eq(reviews.reviewedId, query.reviewedId));
@@ -137,18 +137,8 @@ export const POST = createApiHandler({
     // Check if user is involved in this booking
     const isRenter = booking.renterId === user.id;
     if (!isRenter) {
-      // Check if user is the car owner
-      const [car] = await db
-        .select()
-        .from(bookings)
-        .where(eq(bookings.id, body.bookingId))
-        .limit(1);
-
-      // This query is incomplete - need to join with cars table
-      // For now, we'll just check if the user is the renter
-      if (!isRenter) {
-        throwApiError('You can only review bookings you are involved in', 'FORBIDDEN', 403);
-      }
+      // TODO: Implement car owner check by joining with cars table
+      throwApiError('You can only review bookings you are involved in', 'FORBIDDEN', 403);
     }
 
     // Validate review type and reviewed user

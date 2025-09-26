@@ -10,7 +10,7 @@ import { getCurrentUser } from '@/lib/auth-server';
 export const GET = createApiHandler({
   requireAuth: true,
   rateLimit: { max: 60, windowMs: 60 * 1000 },
-})(async (req: NextRequest) => {
+})(async () => {
   const user = await getCurrentUser();
   if (!user) {
     throwApiError('Authentication required', 'UNAUTHORIZED', 401);
@@ -62,7 +62,7 @@ export const PUT = createApiHandler({
 
   try {
     // Prepare update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     Object.entries(body).forEach(([key, value]) => {
       if (value !== undefined) {
@@ -105,15 +105,16 @@ export const PUT = createApiHandler({
     }
 
     return NextResponse.json({ user: updatedUser });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating user profile:', error);
 
     // Handle unique constraint violations
-    if (error.code === '23505') {
-      if (error.detail?.includes('phone')) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+      const errorDetail = 'detail' in error ? error.detail as string : '';
+      if (errorDetail?.includes('phone')) {
         throwApiError('Phone number already in use', 'DUPLICATE_PHONE', 409);
       }
-      if (error.detail?.includes('email')) {
+      if (errorDetail?.includes('email')) {
         throwApiError('Email already in use', 'DUPLICATE_EMAIL', 409);
       }
     }

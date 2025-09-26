@@ -13,7 +13,7 @@ export const GET = createApiHandler({
   const { searchParams } = new URL(req.url);
   const query = validateQuery(carQuerySchema, searchParams);
 
-  let whereConditions = [];
+  const whereConditions = [];
 
   // Add filters
   if (query.location) {

@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 
 // GET /api/health - Health check endpoint
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Check database connectivity
     await db.select().from(users).limit(1);

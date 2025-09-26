@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function handleSuccessfulPayment(data: any) {
+async function handleSuccessfulPayment(data: { reference: string; amount: number }) {
   try {
     const reference = data.reference;
     const amount = data.amount / 100; // Paystack amounts are in kobo
@@ -98,7 +98,7 @@ async function handleSuccessfulPayment(data: any) {
   }
 }
 
-async function handleFailedPayment(data: any) {
+async function handleFailedPayment(data: { reference: string }) {
   try {
     const reference = data.reference;
 
